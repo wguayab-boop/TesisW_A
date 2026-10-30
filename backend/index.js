@@ -4,8 +4,6 @@ const path = require("node:path");
 const { existsSync } = require("node:fs");
 const { loadEnvFile } = require("node:process");
 
-// En tu computadora carga .env.
-// En el alojamiento también permite usar variables del servicio.
 const archivoEnv = path.join(__dirname, ".env");
 
 if (existsSync(archivoEnv)) {
@@ -21,13 +19,22 @@ const pool = require("./db");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET || JWT_SECRET.length < 64) {
-  throw new Error("Falta una clave JWT_SECRET válida en .env o en las variables del alojamiento");
+  throw new Error(
+    "Falta una clave JWT_SECRET válida en .env o en las variables del alojamiento"
+  );
 }
 
-const app = express();
+const CATEGORIAS = [
+  "Abarrotes",
+  "Ropa y accesorios",
+  "Tecnología",
+  "Alimentos y bebidas",
+  "Belleza y cuidado personal",
+  "Ferretería",
+  "Otros"
+];
 
-// El alojamiento puede asignar el puerto.
-// En tu computadora utiliza 3000.
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -43,7 +50,7 @@ app.use(
 // ============================================================
 
 app.get("/", (req, res) => {
-  res.json({
+  return res.json({
     mensaje: "API de SMARTMARKET-GUAYAQUIL funcionando correctamente"
   });
 });
@@ -57,10 +64,7 @@ app.get("/test-db", async (req, res) => {
       fecha: resultado.rows[0].fecha
     });
   } catch (error) {
-    console.error(
-      "Error de conexión con PostgreSQL:",
-      error.message
-    );
+    console.error("Error de conexión con PostgreSQL:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo conectar con PostgreSQL"
@@ -69,11 +73,17 @@ app.get("/test-db", async (req, res) => {
 });
 
 // ============================================================
-// REGISTRO
+// REGISTRO: CREA EL EMPRENDIMIENTO Y SU USUARIO
 // ============================================================
 
 app.post("/registro", async (req, res) => {
-  const { nombre, correo, password } = req.body || {};
+  const {
+    nombre,
+    correo,
+    password,
+    tienda,
+    categoria
+  } = req.body || {};
 
   if (
     typeof nombre !== "string" ||
@@ -109,35 +119,83 @@ app.post("/registro", async (req, res) => {
     });
   }
 
+  if (
+    typeof tienda !== "string" ||
+    !tienda.trim() ||
+    tienda.trim().length > 150
+  ) {
+    return res.status(400).json({
+      mensaje: "Escribe el nombre de tu tienda, máximo 150 caracteres"
+    });
+  }
+
+  if (
+    typeof categoria !== "string" ||
+    !CATEGORIAS.includes(categoria)
+  ) {
+    return res.status(400).json({
+      mensaje: "Selecciona una categoría válida para tu negocio"
+    });
+  }
+
+  let db;
+
   try {
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const resultado = await pool.query(
-      `INSERT INTO usuarios (nombre, correo, password_hash)
-       VALUES ($1, $2, $3)
-       RETURNING id, nombre, correo, rol`,
-      [nombreLimpio, correoLimpio, passwordHash]
+    db = await pool.connect();
+    await db.query("BEGIN");
+
+    const negocio = await db.query(
+      `INSERT INTO emprendimientos (nombre, categoria)
+       VALUES ($1, $2)
+       RETURNING id`,
+      [tienda.trim(), categoria]
     );
+
+    // El registro público siempre crea un usuario normal.
+    const resultado = await db.query(
+      `INSERT INTO usuarios (
+         nombre,
+         correo,
+         password_hash,
+         rol,
+         emprendimiento_id
+       )
+       VALUES ($1, $2, $3, 'usuario', $4)
+       RETURNING id, nombre, correo, rol, emprendimiento_id`,
+      [
+        nombreLimpio,
+        correoLimpio,
+        passwordHash,
+        negocio.rows[0].id
+      ]
+    );
+
+    await db.query("COMMIT");
 
     return res.status(201).json({
       mensaje: "Usuario registrado correctamente",
       usuario: resultado.rows[0]
     });
   } catch (error) {
+    if (db) {
+      await db.query("ROLLBACK").catch(() => {});
+    }
+
     if (error.code === "23505") {
       return res.status(409).json({
         mensaje: "Ese correo ya está registrado"
       });
     }
 
-    console.error(
-      "Error al registrar usuario:",
-      error.message
-    );
+    console.error("Error al registrar usuario:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo registrar el usuario"
     });
+  } finally {
+    if (db) db.release();
   }
 });
 
@@ -163,9 +221,19 @@ app.post("/login", async (req, res) => {
 
   try {
     const resultado = await pool.query(
-      `SELECT id, nombre, correo, password_hash, rol, activo
-       FROM usuarios
-       WHERE correo = $1`,
+      `SELECT
+         u.id,
+         u.nombre,
+         u.correo,
+         u.password_hash,
+         u.rol,
+         u.activo,
+         u.emprendimiento_id,
+         e.nombre AS tienda,
+         e.categoria
+       FROM usuarios u
+       LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
+       WHERE u.correo = $1`,
       [correo.trim().toLowerCase()]
     );
 
@@ -201,14 +269,14 @@ app.post("/login", async (req, res) => {
         id: usuario.id,
         nombre: usuario.nombre,
         correo: usuario.correo,
-        rol: usuario.rol
+        rol: usuario.rol,
+        emprendimiento_id: usuario.emprendimiento_id,
+        tienda: usuario.tienda,
+        categoria: usuario.categoria
       }
     });
   } catch (error) {
-    console.error(
-      "Error al verificar credenciales:",
-      error.message
-    );
+    console.error("Error al verificar credenciales:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo verificar el inicio de sesión"
@@ -217,7 +285,7 @@ app.post("/login", async (req, res) => {
 });
 
 // ============================================================
-// VERIFICACIÓN DE ACCESO
+// VERIFICACIÓN DE ACCESO Y SEPARACIÓN POR EMPRENDIMIENTO
 // ============================================================
 
 async function verificarToken(req, res, next) {
@@ -254,9 +322,18 @@ async function verificarToken(req, res, next) {
 
   try {
     const resultado = await pool.query(
-      `SELECT id, nombre, correo, rol
-       FROM usuarios
-       WHERE id::text = $1 AND activo = TRUE`,
+      `SELECT
+         u.id,
+         u.nombre,
+         u.correo,
+         u.rol,
+         u.emprendimiento_id,
+         e.nombre AS tienda,
+         e.categoria
+       FROM usuarios u
+       LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
+       WHERE u.id::text = $1
+         AND u.activo = TRUE`,
       [datos.sub]
     );
 
@@ -268,12 +345,49 @@ async function verificarToken(req, res, next) {
 
     req.usuario = resultado.rows[0];
 
+    const administrador = req.usuario.rol === "administrador";
+
+    if (!administrador && !req.usuario.emprendimiento_id) {
+      return res.status(403).json({
+        mensaje: "Tu cuenta no tiene un emprendimiento asignado"
+      });
+    }
+
+    // Usuarios normales: su emprendimiento procede de la sesión.
+    // Administrador: null permite la consulta general.
+    req.negocioId = administrador
+      ? null
+      : req.usuario.emprendimiento_id;
+
+    // Solo el administrador puede filtrar consultas por otra tienda.
+    const filtro = req.get("X-Emprendimiento");
+
+    if (administrador && filtro) {
+      if (
+        !/^[1-9]\d*$/.test(filtro) ||
+        Number(filtro) > 2147483647
+      ) {
+        return res.status(400).json({
+          mensaje: "Emprendimiento inválido"
+        });
+      }
+
+      req.negocioId = Number(filtro);
+    }
+
+    // El administrador general supervisa; las operaciones se
+    // registran con una cuenta normal del emprendimiento.
+    if (administrador && req.method !== "GET") {
+      return res.status(403).json({
+        mensaje:
+          "El administrador general tiene acceso de consulta. " +
+          "Usa una cuenta del emprendimiento para registrar operaciones."
+      });
+    }
+
     return next();
   } catch (error) {
-    console.error(
-      "Error al verificar usuario:",
-      error.message
-    );
+    console.error("Error al verificar usuario:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo comprobar el acceso"
@@ -281,11 +395,41 @@ async function verificarToken(req, res, next) {
   }
 }
 
+// ============================================================
+// PERFIL Y EMPRENDIMIENTOS
+// ============================================================
+
 app.get("/perfil", verificarToken, (req, res) => {
   return res.json({
     mensaje: "Acceso autorizado",
     usuario: req.usuario
   });
+});
+
+app.get("/emprendimientos", verificarToken, async (req, res) => {
+  if (req.usuario.rol !== "administrador") {
+    return res.status(403).json({
+      mensaje: "Acceso exclusivo del administrador"
+    });
+  }
+
+  try {
+    const resultado = await pool.query(
+      `SELECT id, nombre, categoria
+       FROM emprendimientos
+       ORDER BY nombre, id`
+    );
+
+    return res.json({
+      emprendimientos: resultado.rows
+    });
+  } catch (error) {
+    console.error("Error al consultar emprendimientos:", error.message);
+
+    return res.status(500).json({
+      mensaje: "No se pudieron consultar los emprendimientos"
+    });
+  }
 });
 
 // ============================================================
@@ -295,20 +439,27 @@ app.get("/perfil", verificarToken, (req, res) => {
 app.get("/productos", verificarToken, async (req, res) => {
   try {
     const resultado = await pool.query(
-      `SELECT id, nombre, descripcion, precio
-       FROM productos
-       WHERE activo = TRUE
-       ORDER BY nombre, id`
+      `SELECT
+         p.id,
+         p.nombre,
+         p.descripcion,
+         p.precio,
+         p.emprendimiento_id,
+         e.nombre AS tienda,
+         e.categoria
+       FROM productos p
+       JOIN emprendimientos e ON e.id = p.emprendimiento_id
+       WHERE p.activo = TRUE
+         AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
+       ORDER BY p.nombre, p.id`,
+      [req.negocioId]
     );
 
     return res.json({
       productos: resultado.rows
     });
   } catch (error) {
-    console.error(
-      "Error al consultar productos:",
-      error.message
-    );
+    console.error("Error al consultar productos:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudieron consultar los productos"
@@ -325,8 +476,7 @@ app.post("/productos", verificarToken, async (req, res) => {
     nombre.trim().length > 150
   ) {
     return res.status(400).json({
-      mensaje:
-        "El nombre es obligatorio y admite hasta 150 caracteres"
+      mensaje: "El nombre es obligatorio y admite hasta 150 caracteres"
     });
   }
 
@@ -359,13 +509,16 @@ app.post("/productos", verificarToken, async (req, res) => {
 
   try {
     const resultado = await pool.query(
-      `INSERT INTO productos (nombre, descripcion, precio)
-       VALUES ($1, $2, $3)
+      `INSERT INTO productos (
+         nombre, descripcion, precio, emprendimiento_id
+       )
+       VALUES ($1, $2, $3, $4)
        RETURNING id, nombre, descripcion, precio`,
       [
         nombre.trim(),
         descripcion?.trim() || null,
-        precioTexto
+        precioTexto,
+        req.negocioId
       ]
     );
 
@@ -374,10 +527,7 @@ app.post("/productos", verificarToken, async (req, res) => {
       producto: resultado.rows[0]
     });
   } catch (error) {
-    console.error(
-      "Error al registrar producto:",
-      error.message
-    );
+    console.error("Error al registrar producto:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo registrar el producto"
@@ -401,8 +551,7 @@ app.put("/productos/:id", verificarToken, async (req, res) => {
     nombre.trim().length > 150
   ) {
     return res.status(400).json({
-      mensaje:
-        "El nombre es obligatorio y admite hasta 150 caracteres"
+      mensaje: "El nombre es obligatorio y admite hasta 150 caracteres"
     });
   }
 
@@ -439,13 +588,16 @@ app.put("/productos/:id", verificarToken, async (req, res) => {
        SET nombre = $1,
            descripcion = $2,
            precio = $3
-       WHERE id = $4 AND activo = TRUE
+       WHERE id = $4
+         AND activo = TRUE
+         AND emprendimiento_id = $5
        RETURNING id, nombre, descripcion, precio`,
       [
         nombre.trim(),
         descripcion?.trim() || null,
         precioTexto,
-        id
+        id,
+        req.negocioId
       ]
     );
 
@@ -460,10 +612,7 @@ app.put("/productos/:id", verificarToken, async (req, res) => {
       producto: resultado.rows[0]
     });
   } catch (error) {
-    console.error(
-      "Error al actualizar producto:",
-      error.message
-    );
+    console.error("Error al actualizar producto:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo actualizar el producto"
@@ -488,8 +637,9 @@ app.patch(
         `UPDATE productos
          SET activo = FALSE
          WHERE id = $1
+           AND emprendimiento_id = $2
          RETURNING id, nombre, activo`,
-        [id]
+        [id, req.negocioId]
       );
 
       if (!resultado.rows[0]) {
@@ -503,10 +653,7 @@ app.patch(
         producto: resultado.rows[0]
       });
     } catch (error) {
-      console.error(
-        "Error al desactivar producto:",
-        error.message
-      );
+      console.error("Error al desactivar producto:", error.message);
 
       return res.status(500).json({
         mensaje: "No se pudo desactivar el producto"
@@ -525,21 +672,23 @@ app.get("/inventario", verificarToken, async (req, res) => {
       `SELECT
          p.id AS producto_id,
          p.nombre,
+         p.emprendimiento_id,
+         e.nombre AS tienda,
          COALESCE(i.existencia, 0) AS existencia
        FROM productos p
+       JOIN emprendimientos e ON e.id = p.emprendimiento_id
        LEFT JOIN inventario i ON i.producto_id = p.id
        WHERE p.activo = TRUE
-       ORDER BY p.nombre, p.id`
+         AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
+       ORDER BY p.nombre, p.id`,
+      [req.negocioId]
     );
 
     return res.json({
       inventario: resultado.rows
     });
   } catch (error) {
-    console.error(
-      "Error al consultar inventario:",
-      error.message
-    );
+    console.error("Error al consultar inventario:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo consultar el inventario"
@@ -580,8 +729,7 @@ app.post(
       cantidad > 2147483647
     ) {
       return res.status(400).json({
-        mensaje:
-          "La cantidad debe ser un número entero mayor que cero"
+        mensaje: "La cantidad debe ser un número entero mayor que cero"
       });
     }
 
@@ -591,8 +739,7 @@ app.post(
       motivo.trim().length > 250
     ) {
       return res.status(400).json({
-        mensaje:
-          "El motivo es obligatorio y admite hasta 250 caracteres"
+        mensaje: "El motivo es obligatorio y admite hasta 250 caracteres"
       });
     }
 
@@ -600,15 +747,16 @@ app.post(
 
     try {
       cliente = await pool.connect();
-
       await cliente.query("BEGIN");
 
       const producto = await cliente.query(
         `SELECT id
          FROM productos
-         WHERE id = $1 AND activo = TRUE
+         WHERE id = $1
+           AND activo = TRUE
+           AND emprendimiento_id = $2
          FOR UPDATE`,
-        [producto_id]
+        [producto_id, req.negocioId]
       );
 
       if (!producto.rows[0]) {
@@ -636,17 +784,15 @@ app.post(
 
       const anterior = inventario.rows[0].existencia;
 
-      const nueva =
-        tipo === "entrada"
-          ? anterior + cantidad
-          : anterior - cantidad;
+      const nueva = tipo === "entrada"
+        ? anterior + cantidad
+        : anterior - cantidad;
 
       if (nueva < 0) {
         await cliente.query("ROLLBACK");
 
         return res.status(409).json({
-          mensaje:
-            "No hay existencias suficientes para esa salida",
+          mensaje: "No hay existencias suficientes para esa salida",
           existencia: anterior
         });
       }
@@ -655,8 +801,7 @@ app.post(
         await cliente.query("ROLLBACK");
 
         return res.status(400).json({
-          mensaje:
-            "La entrada supera el límite de existencias permitido"
+          mensaje: "La entrada supera el límite de existencias permitido"
         });
       }
 
@@ -709,10 +854,7 @@ app.post(
         }
       }
 
-      console.error(
-        "Error al registrar movimiento:",
-        error.message
-      );
+      console.error("Error al registrar movimiento:", error.message);
 
       return res.status(500).json({
         mensaje: "No se pudo registrar el movimiento"
@@ -791,20 +933,29 @@ function idClienteValido(id) {
 app.get("/clientes", verificarToken, async (req, res) => {
   try {
     const resultado = await pool.query(
-      `SELECT id, nombre, identificacion, telefono, correo, direccion
-       FROM clientes
-       WHERE activo = TRUE
-       ORDER BY nombre, id`
+      `SELECT
+         c.id,
+         c.nombre,
+         c.identificacion,
+         c.telefono,
+         c.correo,
+         c.direccion,
+         c.emprendimiento_id,
+         e.nombre AS tienda,
+         e.categoria
+       FROM clientes c
+       JOIN emprendimientos e ON e.id = c.emprendimiento_id
+       WHERE c.activo = TRUE
+         AND ($1::integer IS NULL OR c.emprendimiento_id = $1)
+       ORDER BY c.nombre, c.id`,
+      [req.negocioId]
     );
 
     return res.json({
       clientes: resultado.rows
     });
   } catch (error) {
-    console.error(
-      "Error al consultar clientes:",
-      error.message
-    );
+    console.error("Error al consultar clientes:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudieron consultar los clientes"
@@ -830,16 +981,18 @@ app.post("/clientes", verificarToken, async (req, res) => {
          identificacion,
          telefono,
          correo,
-         direccion
+         direccion,
+         emprendimiento_id
        )
-       VALUES ($1, $2, $3, $4, $5)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, nombre, identificacion, telefono, correo, direccion`,
       [
         d.nombre,
         d.identificacion,
         d.telefono,
         d.correo,
-        d.direccion
+        d.direccion,
+        req.negocioId
       ]
     );
 
@@ -848,10 +1001,7 @@ app.post("/clientes", verificarToken, async (req, res) => {
       cliente: resultado.rows[0]
     });
   } catch (error) {
-    console.error(
-      "Error al registrar cliente:",
-      error.message
-    );
+    console.error("Error al registrar cliente:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo registrar el cliente"
@@ -884,7 +1034,9 @@ app.put("/clientes/:id", verificarToken, async (req, res) => {
            telefono = $3,
            correo = $4,
            direccion = $5
-       WHERE id = $6 AND activo = TRUE
+       WHERE id = $6
+         AND activo = TRUE
+         AND emprendimiento_id = $7
        RETURNING id, nombre, identificacion, telefono, correo, direccion`,
       [
         d.nombre,
@@ -892,7 +1044,8 @@ app.put("/clientes/:id", verificarToken, async (req, res) => {
         d.telefono,
         d.correo,
         d.direccion,
-        req.params.id
+        req.params.id,
+        req.negocioId
       ]
     );
 
@@ -907,10 +1060,7 @@ app.put("/clientes/:id", verificarToken, async (req, res) => {
       cliente: resultado.rows[0]
     });
   } catch (error) {
-    console.error(
-      "Error al actualizar cliente:",
-      error.message
-    );
+    console.error("Error al actualizar cliente:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo actualizar el cliente"
@@ -933,8 +1083,9 @@ app.patch(
         `UPDATE clientes
          SET activo = FALSE
          WHERE id = $1
+           AND emprendimiento_id = $2
          RETURNING id, nombre, activo`,
-        [req.params.id]
+        [req.params.id, req.negocioId]
       );
 
       if (!resultado.rows[0]) {
@@ -948,10 +1099,7 @@ app.patch(
         cliente: resultado.rows[0]
       });
     } catch (error) {
-      console.error(
-        "Error al desactivar cliente:",
-        error.message
-      );
+      console.error("Error al desactivar cliente:", error.message);
 
       return res.status(500).json({
         mensaje: "No se pudo desactivar el cliente"
@@ -1040,10 +1188,19 @@ app.get("/ventas", verificarToken, async (req, res) => {
          v.total,
          v.estado,
          v.observacion,
-         v.fecha_creacion
+         v.fecha_creacion,
+         v.emprendimiento_id,
+         e.nombre AS tienda,
+         u.nombre AS usuario_nombre
        FROM ventas v
        JOIN clientes c ON c.id = v.cliente_id
+       JOIN emprendimientos e ON e.id = v.emprendimiento_id
+       JOIN usuarios u ON u.id = v.usuario_id
        WHERE (
+         $4::integer IS NULL
+         OR v.emprendimiento_id = $4
+       )
+       AND (
          $1::date IS NULL
          OR (v.fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
             >= $1::date
@@ -1063,7 +1220,8 @@ app.get("/ventas", verificarToken, async (req, res) => {
       [
         filtros.desde,
         filtros.hasta,
-        filtros.busqueda
+        filtros.busqueda,
+        req.negocioId
       ]
     );
 
@@ -1071,10 +1229,7 @@ app.get("/ventas", verificarToken, async (req, res) => {
       ventas: resultado.rows
     });
   } catch (error) {
-    console.error(
-      "Error al consultar ventas:",
-      error.message
-    );
+    console.error("Error al consultar ventas:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudieron consultar las ventas"
@@ -1094,11 +1249,18 @@ app.get("/ventas/:id", verificarToken, async (req, res) => {
 
   try {
     const resultado = await pool.query(
-      `SELECT v.*, c.nombre AS cliente_nombre
+      `SELECT
+         v.*,
+         c.nombre AS cliente_nombre,
+         e.nombre AS tienda,
+         u.nombre AS usuario_nombre
        FROM ventas v
        JOIN clientes c ON c.id = v.cliente_id
-       WHERE v.id = $1`,
-      [req.params.id]
+       JOIN emprendimientos e ON e.id = v.emprendimiento_id
+       JOIN usuarios u ON u.id = v.usuario_id
+       WHERE v.id = $1
+         AND ($2::integer IS NULL OR v.emprendimiento_id = $2)`,
+      [req.params.id, req.negocioId]
     );
 
     if (!resultado.rows[0]) {
@@ -1125,10 +1287,7 @@ app.get("/ventas/:id", verificarToken, async (req, res) => {
       detalle: detalle.rows
     });
   } catch (error) {
-    console.error(
-      "Error al consultar venta:",
-      error.message
-    );
+    console.error("Error al consultar venta:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo consultar la venta"
@@ -1201,15 +1360,16 @@ app.post("/ventas", verificarToken, async (req, res) => {
 
   try {
     db = await pool.connect();
-
     await db.query("BEGIN");
 
     const cliente = await db.query(
       `SELECT id
        FROM clientes
-       WHERE id = $1 AND activo = TRUE
+       WHERE id = $1
+         AND activo = TRUE
+         AND emprendimiento_id = $2
        FOR SHARE`,
-      [cliente_id]
+      [cliente_id, req.negocioId]
     );
 
     if (!cliente.rows[0]) {
@@ -1227,17 +1387,18 @@ app.post("/ventas", verificarToken, async (req, res) => {
       const producto = await db.query(
         `SELECT id, nombre, precio
          FROM productos
-         WHERE id = $1 AND activo = TRUE
+         WHERE id = $1
+           AND activo = TRUE
+           AND emprendimiento_id = $2
          FOR UPDATE`,
-        [item.producto_id]
+        [item.producto_id, req.negocioId]
       );
 
       if (!producto.rows[0]) {
         await db.query("ROLLBACK");
 
         return res.status(409).json({
-          mensaje:
-            "Uno de los productos ya no está disponible"
+          mensaje: "Uno de los productos ya no está disponible"
         });
       }
 
@@ -1304,15 +1465,17 @@ app.post("/ventas", verificarToken, async (req, res) => {
          cliente_id,
          usuario_id,
          total,
-         observacion
+         observacion,
+         emprendimiento_id
        )
-       VALUES ($1, $2, $3, $4)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [
         cliente_id,
         req.usuario.id,
         dinero(total),
-        observacion?.trim() || null
+        observacion?.trim() || null,
+        req.negocioId
       ]
     );
 
@@ -1383,17 +1546,11 @@ app.post("/ventas", verificarToken, async (req, res) => {
       try {
         await db.query("ROLLBACK");
       } catch (errorRollback) {
-        console.error(
-          "Error al revertir venta:",
-          errorRollback.message
-        );
+        console.error("Error al revertir venta:", errorRollback.message);
       }
     }
 
-    console.error(
-      "Error al registrar venta:",
-      error.message
-    );
+    console.error("Error al registrar venta:", error.message);
 
     return res.status(500).json({
       mensaje:
@@ -1416,6 +1573,7 @@ app.get("/resumen", verificarToken, async (req, res) => {
            SELECT COUNT(*)::int
            FROM ventas
            WHERE estado = 'registrada'
+             AND ($1::integer IS NULL OR emprendimiento_id = $1)
              AND (fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
                = (NOW() AT TIME ZONE 'America/Guayaquil')::date
          ) AS ventas_hoy,
@@ -1424,6 +1582,7 @@ app.get("/resumen", verificarToken, async (req, res) => {
            SELECT COALESCE(SUM(total), 0)::numeric(16, 2)
            FROM ventas
            WHERE estado = 'registrada'
+             AND ($1::integer IS NULL OR emprendimiento_id = $1)
              AND (fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
                = (NOW() AT TIME ZONE 'America/Guayaquil')::date
          ) AS total_hoy,
@@ -1432,12 +1591,14 @@ app.get("/resumen", verificarToken, async (req, res) => {
            SELECT COUNT(*)::int
            FROM clientes
            WHERE activo = TRUE
+             AND ($1::integer IS NULL OR emprendimiento_id = $1)
          ) AS clientes,
 
          (
            SELECT COUNT(*)::int
            FROM productos
            WHERE activo = TRUE
+             AND ($1::integer IS NULL OR emprendimiento_id = $1)
          ) AS productos,
 
          (
@@ -1445,6 +1606,7 @@ app.get("/resumen", verificarToken, async (req, res) => {
            FROM productos p
            LEFT JOIN inventario i ON i.producto_id = p.id
            WHERE p.activo = TRUE
+             AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
              AND COALESCE(i.existencia, 0) = 0
          ) AS sin_stock,
 
@@ -1453,18 +1615,17 @@ app.get("/resumen", verificarToken, async (req, res) => {
            FROM productos p
            LEFT JOIN inventario i ON i.producto_id = p.id
            WHERE p.activo = TRUE
+             AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
              AND COALESCE(i.existencia, 0) BETWEEN 1 AND 5
-         ) AS stock_bajo`
+         ) AS stock_bajo`,
+      [req.negocioId]
     );
 
     return res.json({
       resumen: resultado.rows[0]
     });
   } catch (error) {
-    console.error(
-      "Error en resumen:",
-      error.message
-    );
+    console.error("Error en resumen:", error.message);
 
     return res.status(500).json({
       mensaje: "No se pudo consultar el resumen"
@@ -1511,6 +1672,8 @@ app.get(
            m.id,
            m.producto_id,
            p.nombre,
+           p.emprendimiento_id,
+           e.nombre AS tienda,
            m.tipo,
            m.cantidad,
            m.motivo,
@@ -1520,8 +1683,13 @@ app.get(
            u.nombre AS usuario_nombre
          FROM movimientos_inventario m
          JOIN productos p ON p.id = m.producto_id
+         JOIN emprendimientos e ON e.id = p.emprendimiento_id
          JOIN usuarios u ON u.id = m.usuario_id
          WHERE (
+           $5::integer IS NULL
+           OR p.emprendimiento_id = $5
+         )
+         AND (
            $1::integer IS NULL
            OR m.producto_id = $1
          )
@@ -1545,7 +1713,8 @@ app.get(
           producto,
           filtros.desde,
           filtros.hasta,
-          filtros.busqueda
+          filtros.busqueda,
+          req.negocioId
         ]
       );
 
@@ -1553,10 +1722,7 @@ app.get(
         movimientos: resultado.rows
       });
     } catch (error) {
-      console.error(
-        "Error en historial:",
-        error.message
-      );
+      console.error("Error en historial:", error.message);
 
       return res.status(500).json({
         mensaje: "No se pudo consultar el historial"
@@ -1585,15 +1751,15 @@ app.patch(
 
     try {
       db = await pool.connect();
-
       await db.query("BEGIN");
 
       const resultado = await db.query(
         `SELECT id, estado
          FROM ventas
          WHERE id = $1
+           AND emprendimiento_id = $2
          FOR UPDATE`,
-        [id]
+        [id, req.negocioId]
       );
 
       if (!resultado.rows[0]) {
@@ -1644,9 +1810,7 @@ app.patch(
         );
 
         if (!inventario.rows[0]) {
-          throw new Error(
-            "No existe inventario para el producto"
-          );
+          throw new Error("No existe inventario para el producto");
         }
 
         const anterior = inventario.rows[0].existencia;
@@ -1656,8 +1820,7 @@ app.patch(
           await db.query("ROLLBACK");
 
           return res.status(409).json({
-            mensaje:
-              "La devolución supera el límite de inventario"
+            mensaje: "La devolución supera el límite de inventario"
           });
         }
 
@@ -1702,8 +1865,7 @@ app.patch(
       await db.query("COMMIT");
 
       return res.json({
-        mensaje:
-          "Venta anulada. Existencias devueltas al inventario.",
+        mensaje: "Venta anulada. Existencias devueltas al inventario.",
         venta: venta.rows[0]
       });
     } catch (error) {
@@ -1718,10 +1880,7 @@ app.patch(
         }
       }
 
-      console.error(
-        "Error al anular venta:",
-        error.message
-      );
+      console.error("Error al anular venta:", error.message);
 
       return res.status(500).json({
         mensaje:
@@ -1744,7 +1903,5 @@ require("./recuperacion")(app, pool);
 // ============================================================
 
 app.listen(PORT, () => {
-  console.log(
-    `Servidor funcionando en http://localhost:${PORT}`
-  );
+  console.log(`Servidor funcionando en http://localhost:${PORT}`);
 });
