@@ -2,3 +2,8 @@
 bin/
 obj/
 *.user
+.env
+.env.*
+!.env.example
+*.backup
+node_modules/
