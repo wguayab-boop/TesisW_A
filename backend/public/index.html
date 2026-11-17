@@ -791,7 +791,7 @@ function acceso() {
           ? `
             <label>
               Emprendimiento
-              <select id="seleccionNegocio">
+              <select id="seleccionNegocio" style="width: 250px; max-width: 100%;">
                 <option value="">Todos los emprendimientos</option>
                 ${negocios.map(n => `
                   <option value="${E(n.id)}"
@@ -1465,7 +1465,9 @@ function formulario(registro) {
       }
 
       <button class="primary" type="submit">Guardar</button>
+      <p style="margin: 12px 0; text-align: center; font-size: 0.85rem;">Desarrollado por AA y WG</p>
     </form>
+    
   `);
 }
 

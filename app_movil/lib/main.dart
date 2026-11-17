@@ -1,13 +1,3 @@
-// ARCHIVO COMPLETO: app_movil/lib/main.dart
-// Reemplaza todo el contenido de main.dart con este código.
-//
-// Recuperación conectada a las rutas de recuperacion.js:
-// POST /recuperar-password      {correo}
-// POST /restablecer-password    {token, password}
-//
-// El envío de correo requiere la configuración existente del backend.
-// El enlace del correo abre la web. En la app puedes pegar el enlace
-// completo o únicamente el token para cambiar la contraseña.
 
 import 'dart:async';
 import 'dart:convert';
@@ -15,7 +5,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const apiUrl = 'http://10.0.2.2:3000';
+const apiUrl = 'https://smartmarket-guayaquil.onrender.com';
+
+final perfilesSesion = <String, Map<String, dynamic>>{};
+final filtrosSesion = <String, int>{};
+bool esAdministrador(String token) => perfilesSesion[token]?['rol'] == 'administrador';
+const categorias = ['Abarrotes', 'Ropa y accesorios', 'Tecnología', 'Alimentos y bebidas', 'Belleza y cuidado personal', 'Ferretería', 'Otros'];
 const rutaSolicitarRecuperacion = '/recuperar-password';
 const rutaCambiarPassword = '/restablecer-password';
 
@@ -46,12 +41,17 @@ Future<Map<String, dynamic>> api(
   Map<String, dynamic>? datos,
 }) async {
   final mutacion = metodo != 'GET';
+  if (token != null && esAdministrador(token) && mutacion) {
+    throw const ErrorApi('El administrador tiene acceso de consulta.');
+  }
 
   try {
     final uri = Uri.parse('$apiUrl$ruta');
     final headers = <String, String>{
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
+      if (token != null && esAdministrador(token) && filtrosSesion.containsKey(token))
+        'X-Emprendimiento': '${filtrosSesion[token]}',
     };
     final body = jsonEncode(datos ?? {});
     final Future<http.Response> peticion;
@@ -71,7 +71,7 @@ Future<Map<String, dynamic>> api(
     }
 
     final respuesta =
-        await peticion.timeout(const Duration(seconds: 30));
+        await peticion.timeout(const Duration(seconds: 90));
 
     Map<String, dynamic>? contenido;
 
@@ -799,7 +799,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> ingresar() async {
-    if (ocupado || !form.currentState!.validate()) return;
+    if (ocupado || !form.currentState!.validate()) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => ocupado = true);
 
@@ -825,6 +827,9 @@ class _LoginPageState extends State<LoginPage> {
 
       final usuario =
           Map<String, dynamic>.from(perfil['usuario'] as Map);
+      perfilesSesion.clear();
+      filtrosSesion.clear();
+      perfilesSesion[token] = usuario;
       if (!mounted) return;
 
       clave.clear();
@@ -938,6 +943,8 @@ class RegistroPage extends StatefulWidget {
 class _RegistroPageState extends State<RegistroPage> {
   final form = GlobalKey<FormState>();
   final nombre = TextEditingController();
+  final tienda = TextEditingController();
+  String categoria = 'Otros';
   final correo = TextEditingController();
   final clave = TextEditingController();
   final repetir = TextEditingController();
@@ -948,6 +955,7 @@ class _RegistroPageState extends State<RegistroPage> {
   @override
   void dispose() {
     nombre.dispose();
+    tienda.dispose();
     correo.dispose();
     clave.dispose();
     repetir.dispose();
@@ -964,7 +972,9 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   Future<void> registrar() async {
-    if (ocupado || incierto || !form.currentState!.validate()) return;
+    if (ocupado || incierto || !form.currentState!.validate()) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => ocupado = true);
 
@@ -974,6 +984,8 @@ class _RegistroPageState extends State<RegistroPage> {
         metodo: 'POST',
         datos: {
           'nombre': nombre.text.trim(),
+          'tienda': tienda.text.trim(),
+          'categoria': categoria,
           'correo': correo.text.trim().toLowerCase(),
           'password': clave.text,
         },
@@ -1031,6 +1043,22 @@ class _RegistroPageState extends State<RegistroPage> {
                   validator: (v) => (v ?? '').trim().isEmpty
                       ? 'Escribe tu nombre completo'
                       : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: tienda,
+                  enabled: habilitado,
+                  maxLength: 150,
+                  decoration: const InputDecoration(labelText: 'Nombre de la tienda', prefixIcon: Icon(Icons.store_outlined)),
+                  validator: (v) => (v ?? '').trim().isEmpty ? 'Escribe el nombre de tu tienda' : null,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: categoria,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Categoría'),
+                  items: categorias.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                  onChanged: habilitado ? (v) => setState(() => categoria = v ?? 'Otros') : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -1145,7 +1173,9 @@ class _RecuperarPageState extends State<RecuperarPage> {
   }
 
   Future<void> procesar() async {
-    if (ocupado || incierto || !form.currentState!.validate()) return;
+    if (ocupado || incierto || !form.currentState!.validate()) {
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => ocupado = true);
 
@@ -1320,7 +1350,7 @@ class _RecuperarPageState extends State<RecuperarPage> {
 
 // ==================== MENÚ ====================
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends StatefulWidget {
   final String token;
   final Map<String, dynamic> usuario;
 
@@ -1330,6 +1360,30 @@ class MenuPage extends StatelessWidget {
     required this.usuario,
   });
 
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
+  String get token => widget.token;
+  Map<String, dynamic> get usuario => widget.usuario;
+  List<Map<String, dynamic>> negocios = [];
+  String? errorNegocios;
+  @override
+  void initState() {
+    super.initState();
+    if (esAdministrador(token)) cargarNegocios();
+  }
+  Future<void> cargarNegocios() async {
+    try {
+      final d = await api('/emprendimientos', token: token);
+      final lista = d['emprendimientos'];
+      if (lista is! List) throw const ErrorApi('No se pudo cargar la lista de tiendas.');
+      if (mounted) setState(() { negocios = lista.map((e) => Map<String, dynamic>.from(e as Map)).toList(); errorNegocios = null; });
+    } catch (e) {
+      if (mounted) setState(() => errorNegocios = '$e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     void abrir(Widget pagina) {
@@ -1346,6 +1400,8 @@ class MenuPage extends StatelessWidget {
         '¿Deseas salir de tu cuenta?',
       );
       if (!ok || !context.mounted) return;
+      perfilesSesion.remove(token);
+      filtrosSesion.remove(token);
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const InicioPage()),
@@ -1424,6 +1480,26 @@ class MenuPage extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
+              if (!esAdministrador(token))
+                Text('${usuario['tienda'] ?? ''} · ${usuario['categoria'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
+              if (esAdministrador(token)) ...[
+                const Text('Supervisión: consulta todos los negocios o selecciona uno.'),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: filtrosSesion[token] ?? 0,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Emprendimiento'),
+                  items: [
+                    const DropdownMenuItem(value: 0, child: Text('Todos los emprendimientos')),
+                    ...negocios.map((e) => DropdownMenuItem(value: e['id'] as int, child: Text('${e['nombre']}'))),
+                  ],
+                  onChanged: (id) => setState(() {
+                    if (id == null || id == 0) { filtrosSesion.remove(token); } else { filtrosSesion[token] = id; }
+                  }),
+                ),
+                if (errorNegocios != null) TextButton(onPressed: cargarNegocios, child: Text('$errorNegocios Reintentar')),
+              ],
               const SizedBox(height: 20),
               const BannerInfo(
                 titulo: 'Comienza con el resumen del día',
@@ -1751,7 +1827,7 @@ class _CatalogoPageState extends State<CatalogoPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${r['nombre']}',
+                                            '${r['nombre']}${esAdministrador(widget.token) ? ' · ${r['tienda'] ?? ''}' : ''}',
                                             style: const TextStyle(
                                               color: azul,
                                               fontSize: 19,
@@ -1772,7 +1848,7 @@ class _CatalogoPageState extends State<CatalogoPage> {
                                             ),
                                           ),
                                           const SizedBox(height: 10),
-                                          Wrap(
+                                          if (!esAdministrador(widget.token)) Wrap(
                                             spacing: 12,
                                             children: [
                                               TextButton.icon(
@@ -1810,7 +1886,7 @@ class _CatalogoPageState extends State<CatalogoPage> {
                       ),
                     ],
                   ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: esAdministrador(widget.token) ? null : FloatingActionButton.extended(
           onPressed: cargando || ocupado ? null : () => formulario(),
           icon: const Icon(Icons.add),
           label: Text(
@@ -1893,7 +1969,9 @@ class _FormularioPageState extends State<FormularioPage> {
     if (ocupado ||
         incierto ||
         finalizado ||
-        !form.currentState!.validate()) return;
+        !form.currentState!.validate()) {
+      return;
+    }
 
     FocusScope.of(context).unfocus();
     setState(() => ocupado = true);
@@ -2103,7 +2181,7 @@ class _InventarioPageState extends State<InventarioPage> {
                                   size: 32,
                                 ),
                                 title: Text(
-                                  '${r['nombre']}',
+                                  '${r['nombre']}${esAdministrador(widget.token) ? ' · ${r['tienda'] ?? ''}' : ''}',
                                   style: const TextStyle(
                                     color: azul,
                                     fontWeight: FontWeight.w800,
@@ -2115,7 +2193,7 @@ class _InventarioPageState extends State<InventarioPage> {
                                 ),
                                 isThreeLine: true,
                                 trailing: const Icon(Icons.swap_vert_rounded),
-                                onTap: () async {
+                                onTap: esAdministrador(widget.token) ? null : () async {
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -2170,7 +2248,9 @@ class _MovimientoPageState extends State<MovimientoPage> {
     if (ocupado ||
         incierto ||
         finalizado ||
-        !form.currentState!.validate()) return;
+        !form.currentState!.validate()) {
+      return;
+    }
 
     FocusScope.of(context).unfocus();
     setState(() => ocupado = true);
@@ -2505,7 +2585,7 @@ class _VentasPageState extends State<VentasPage> {
             ),
           ),
           actions: [
-            if (venta['estado'] == 'registrada')
+            if (!esAdministrador(widget.token) && venta['estado'] == 'registrada')
               TextButton(
                 onPressed: () => Navigator.pop(c, true),
                 child: const Text(
@@ -2642,6 +2722,7 @@ class _VentasPageState extends State<VentasPage> {
                                     ),
                                     subtitle: Text(
                                       '${v['cliente_nombre']}\n'
+                                      '${esAdministrador(widget.token) ? '${v['tienda'] ?? ''} · ${v['usuario_nombre'] ?? ''}\n' : ''}'
                                       '${v['estado']} · '
                                       '${fechaLocal(v['fecha_creacion'])}',
                                     ),
@@ -2664,7 +2745,7 @@ class _VentasPageState extends State<VentasPage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: esAdministrador(widget.token) ? null : FloatingActionButton.extended(
           onPressed: bloqueado
               ? null
               : () async {
@@ -2677,7 +2758,7 @@ class _VentasPageState extends State<VentasPage> {
                   );
                   if (!mounted) return;
                   await cargar();
-                  if (resultado == true && mounted) {
+                  if (resultado == true && context.mounted) {
                     aviso(
                       context,
                       'Venta registrada. Inventario actualizado.',
