@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -190,6 +191,7 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
   #sidebar{transition:none}
 }
 </style>
+
 </head>
 
 <body>
@@ -231,88 +233,89 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
         <span class="marca-portada-ciudad">GUAYAQUIL</span>
       </div>
 
-      <span class="portada-etiqueta" data-texto="portadaEtiqueta">
-        HECHO PARA TU EMPRENDIMIENTO
-      </span>
+  <span class="portada-etiqueta" data-texto="portadaEtiqueta">
+    HECHO PARA TU EMPRENDIMIENTO
+  </span>
 
-      <h2 data-texto="portadaTitulo">
-        Tu negocio, organizado en un solo lugar.
-      </h2>
+  <h2 data-texto="portadaTitulo">
+    Tu negocio, organizado en un solo lugar.
+  </h2>
 
-      <p class="portada-descripcion" data-texto="portadaDescripcion">
-        Productos, clientes y ventas en un mismo lugar.
-        Dedica más tiempo a tus clientes y lleva el control de cada operación.
-      </p>
+  <p class="portada-descripcion" data-texto="portadaDescripcion">
+    Productos, clientes y ventas en un mismo lugar.
+    Dedica más tiempo a tus clientes y lleva el control de cada operación.
+  </p>
 
-      <div class="escena-tienda" aria-hidden="true">
-        <div class="tienda-techo"></div>
-        <div class="tienda-marca">SMARTMARKET</div>
-        <div class="tienda-ventana">
-          <span>▣</span><span>▣</span><span>▣</span>
-        </div>
-        <div class="tienda-puerta"></div>
-        <div class="tienda-nota">
-          ✓ <span data-texto="portadaOrden">Todo en orden</span>
-        </div>
-      </div>
-
-      <div class="portada-beneficios">
-        <div>
-          <span>01</span>
-          <strong data-texto="beneficioUno">Organiza tus productos</strong>
-        </div>
-        <div>
-          <span>02</span>
-          <strong data-texto="beneficioDos">Registra tus ventas</strong>
-        </div>
-        <div>
-          <span>03</span>
-          <strong data-texto="beneficioTres">Conoce tus existencias</strong>
-        </div>
-      </div>
+  <div class="escena-tienda" aria-hidden="true">
+    <div class="tienda-techo"></div>
+    <div class="tienda-marca">SMARTMARKET</div>
+    <div class="tienda-ventana">
+      <span>▣</span><span>▣</span><span>▣</span>
     </div>
+    <div class="tienda-puerta"></div>
+    <div class="tienda-nota">
+      ✓ <span data-texto="portadaOrden">Todo en orden</span>
+    </div>
+  </div>
 
-    <section id="login" class="card login">
-      <span class="login-eyebrow" data-texto="loginEtiqueta">
-        TU ESPACIO DE TRABAJO
-      </span>
-      <h2 data-texto="inicio">Iniciar sesión</h2>
-      <p class="muted" data-texto="descripcionLogin">
-        Utiliza tu cuenta del sistema.
-      </p>
+  <div class="portada-beneficios">
+    <div>
+      <span>01</span>
+      <strong data-texto="beneficioUno">Organiza tus productos</strong>
+    </div>
+    <div>
+      <span>02</span>
+      <strong data-texto="beneficioDos">Registra tus ventas</strong>
+    </div>
+    <div>
+      <span>03</span>
+      <strong data-texto="beneficioTres">Conoce tus existencias</strong>
+    </div>
+  </div>
+</div>
 
-      <form id="loginForm">
-        <label>
-          <span data-texto="correo">Correo electrónico</span>
-          <input name="correo" type="email" required
-                 maxlength="150" autocomplete="username">
-        </label>
-        <label>
-          <span data-texto="password">Contraseña</span>
-          <input name="password" type="password" required
-                 autocomplete="current-password">
-        </label>
-        <button class="primary" type="submit" data-texto="ingresar">
-          Ingresar
-        </button>
-      </form>
+<section id="login" class="card login">
+  <span class="login-eyebrow" data-texto="loginEtiqueta">
+    TU ESPACIO DE TRABAJO
+  </span>
+  <h2 data-texto="inicio">Iniciar sesión</h2>
+  <p class="muted" data-texto="descripcionLogin">
+    Utiliza tu cuenta del sistema.
+  </p>
 
-      <p class="muted" style="margin: 12px 0; text-align: center; font-size: 0.85rem;">
-        Desarrollado por AA y WG
-      </p>
+  <form id="loginForm">
+    <label>
+      <span data-texto="correo">Correo electrónico</span>
+      <input name="correo" type="email" required
+             maxlength="150" autocomplete="username">
+    </label>
+    <label>
+      <span data-texto="password">Contraseña</span>
+      <input name="password" type="password" required
+             autocomplete="current-password">
+    </label>
+    <button class="primary" type="submit" data-texto="ingresar">
+      Ingresar
+    </button>
+  </form>
 
-      <p>
-        <button id="abrirRecuperacion" type="button" data-texto="olvido">
-          ¿Olvidaste tu contraseña?
-        </button>
-      </p>
-      <p class="muted" data-texto="sinCuenta">
-        ¿Todavía no tienes cuenta?
-      </p>
-      <button id="abrirRegistro" type="button" data-texto="crearCuenta">
-        Crear cuenta
-      </button>
-    </section>
+  <p class="muted" style="margin: 12px 0; text-align: center; font-size: 0.85rem;">
+    Desarrollado por AA y WG
+  </p>
+
+  <p>
+    <button id="abrirRecuperacion" type="button" data-texto="olvido">
+      ¿Olvidaste tu contraseña?
+    </button>
+  </p>
+  <p class="muted" data-texto="sinCuenta">
+    ¿Todavía no tienes cuenta?
+  </p>
+  <button id="abrirRegistro" type="button" data-texto="crearCuenta">
+    Crear cuenta
+  </button>
+</section>
+
   </div>
 
   <section class="banners-informativos"
@@ -341,139 +344,145 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
   </section>
 
   <!-- REGISTRO -->
+
   <section id="registro" class="card login" hidden>
     <h2 data-texto="crearCuenta">Crear cuenta</h2>
     <p class="muted" data-texto="descripcionRegistro">
       Registra tus datos para ingresar a SMARTMARKET GUAYAQUIL.
     </p>
 
-    <form id="registroForm">
-      <label>
-        <span data-texto="nombre">Nombre del responsable</span>
-        <input name="nombre" required maxlength="100" autocomplete="name">
-      </label>
+<form id="registroForm">
+  <label>
+    <span data-texto="nombre">Nombre del responsable</span>
+    <input name="nombre" required maxlength="100" autocomplete="name">
+  </label>
 
-      <label>
-        <span data-texto="tienda">Nombre de la tienda</span>
-        <input name="tienda" required maxlength="150"
-               autocomplete="organization">
-      </label>
+  <label>
+    <span data-texto="tienda">Nombre de la tienda</span>
+    <input name="tienda" required maxlength="150"
+           autocomplete="organization">
+  </label>
 
-      <label>
-        <span data-texto="categoria">Categoría del negocio</span>
-        <select name="categoria" required>
-          <option value="" data-texto="seleccionarCategoria">
-            Selecciona una categoría
-          </option>
-          <option value="Abarrotes" data-texto="catAbarrotes">
-            Abarrotes
-          </option>
-          <option value="Ropa y accesorios" data-texto="catRopa">
-            Ropa y accesorios
-          </option>
-          <option value="Tecnología" data-texto="catTecnologia">
-            Tecnología
-          </option>
-          <option value="Alimentos y bebidas" data-texto="catAlimentos">
-            Alimentos y bebidas
-          </option>
-          <option value="Belleza y cuidado personal" data-texto="catBelleza">
-            Belleza y cuidado personal
-          </option>
-          <option value="Ferretería" data-texto="catFerreteria">
-            Ferretería
-          </option>
-          <option value="Otros" data-texto="catOtros">
-            Otros
-          </option>
-        </select>
-      </label>
+  <label>
+    <span data-texto="categoria">Categoría del negocio</span>
+    <select name="categoria" required>
+      <option value="" data-texto="seleccionarCategoria">
+        Selecciona una categoría
+      </option>
+      <option value="Abarrotes" data-texto="catAbarrotes">
+        Abarrotes
+      </option>
+      <option value="Ropa y accesorios" data-texto="catRopa">
+        Ropa y accesorios
+      </option>
+      <option value="Tecnología" data-texto="catTecnologia">
+        Tecnología
+      </option>
+      <option value="Alimentos y bebidas" data-texto="catAlimentos">
+        Alimentos y bebidas
+      </option>
+      <option value="Belleza y cuidado personal" data-texto="catBelleza">
+        Belleza y cuidado personal
+      </option>
+      <option value="Ferretería" data-texto="catFerreteria">
+        Ferretería
+      </option>
+      <option value="Otros" data-texto="catOtros">
+        Otros
+      </option>
+    </select>
+  </label>
 
-      <label>
-        <span data-texto="correo">Correo electrónico</span>
-        <input name="correo" type="email" required maxlength="150"
-               autocomplete="email">
-      </label>
+  <label>
+    <span data-texto="correo">Correo electrónico</span>
+    <input name="correo" type="email" required maxlength="150"
+           autocomplete="email">
+  </label>
 
-      <label>
-        <span data-texto="password">Contraseña</span>
-        <input name="password" type="password" required minlength="8"
-               autocomplete="new-password" aria-describedby="ayudaClave">
-      </label>
+  <label>
+    <span data-texto="password">Contraseña</span>
+    <input name="password" type="password" required minlength="8"
+           autocomplete="new-password" aria-describedby="ayudaClave">
+  </label>
 
-      <small id="ayudaClave" data-texto="ayuda">
-        Mínimo 8 caracteres y máximo 72 bytes.
-      </small>
+  <small id="ayudaClave" data-texto="ayuda">
+    Mínimo 8 caracteres y máximo 72 bytes.
+  </small>
 
-      <label>
-        <span data-texto="confirmar">Confirmar contraseña</span>
-        <input name="confirmacion" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
+  <label>
+    <span data-texto="confirmar">Confirmar contraseña</span>
+    <input name="confirmacion" type="password" required minlength="8"
+           autocomplete="new-password">
+  </label>
 
-      <button class="primary" type="submit" data-texto="registrarse">
-        Registrarse
-      </button>
-    </form>
+  <button class="primary" type="submit" data-texto="registrarse">
+    Registrarse
+  </button>
+</form>
 
-    <p class="muted" data-texto="yaCuenta">¿Ya tienes cuenta?</p>
-    <button id="volverLogin" type="button" data-texto="volver">
-      Volver a iniciar sesión
-    </button>
+<p class="muted" data-texto="yaCuenta">¿Ya tienes cuenta?</p>
+<button id="volverLogin" type="button" data-texto="volver">
+  Volver a iniciar sesión
+</button>
+
   </section>
 
   <!-- RECUPERACIÓN -->
+
   <section id="recuperarCuenta" class="card login" hidden>
     <h2 data-texto="recuperar">Recuperar contraseña</h2>
     <p class="muted" data-texto="recuperacionInfo">
       Escribe el correo con el que registraste tu cuenta.
     </p>
 
-    <form id="formRecuperar">
-      <label>
-        <span data-texto="correo">Correo electrónico</span>
-        <input name="correo" type="email" required maxlength="150"
-               autocomplete="email">
-      </label>
-      <button class="primary" type="submit" data-texto="enviar">
-        Enviar enlace
-      </button>
-    </form>
+<form id="formRecuperar">
+  <label>
+    <span data-texto="correo">Correo electrónico</span>
+    <input name="correo" type="email" required maxlength="150"
+           autocomplete="email">
+  </label>
+  <button class="primary" type="submit" data-texto="enviar">
+    Enviar enlace
+  </button>
+</form>
 
-    <p>
-      <button type="button" id="volverDesdeRecuperar" data-texto="volver">
-        Volver a iniciar sesión
-      </button>
-    </p>
+<p>
+  <button type="button" id="volverDesdeRecuperar" data-texto="volver">
+    Volver a iniciar sesión
+  </button>
+</p>
+
   </section>
 
   <section id="restablecerCuenta" class="card login" hidden>
     <h2 data-texto="nueva">Crear nueva contraseña</h2>
 
-    <form id="formNueva">
-      <label>
-        <span data-texto="nuevaPassword">Nueva contraseña</span>
-        <input name="password" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
-      <label>
-        <span data-texto="confirmar">Confirmar contraseña</span>
-        <input name="confirmacion" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
-      <button class="primary" type="submit" data-texto="guardarClave">
-        Guardar contraseña
-      </button>
-    </form>
+<form id="formNueva">
+  <label>
+    <span data-texto="nuevaPassword">Nueva contraseña</span>
+    <input name="password" type="password" required minlength="8"
+           autocomplete="new-password">
+  </label>
+  <label>
+    <span data-texto="confirmar">Confirmar contraseña</span>
+    <input name="confirmacion" type="password" required minlength="8"
+           autocomplete="new-password">
+  </label>
+  <button class="primary" type="submit" data-texto="guardarClave">
+    Guardar contraseña
+  </button>
+</form>
 
-    <p>
-      <button type="button" id="volverDesdeNueva" data-texto="volver">
-        Volver a iniciar sesión
-      </button>
-    </p>
+<p>
+  <button type="button" id="volverDesdeNueva" data-texto="volver">
+    Volver a iniciar sesión
+  </button>
+</p>
+
   </section>
 
   <!-- PANEL -->
+
   <section id="app" hidden>
     <aside id="sidebar">
       <div class="sidebrand">
@@ -489,12 +498,13 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
       <p class="sidefooter">Tu negocio, bajo control.</p>
     </aside>
 
-    <button id="menuToggle" type="button"
-            aria-controls="sidebar" aria-expanded="true">
-      ☰ Menú
-    </button>
+<button id="menuToggle" type="button"
+        aria-controls="sidebar" aria-expanded="true">
+  ☰ Menú
+</button>
 
-    <div id="contenido"></div>
+<div id="contenido"></div>
+
   </section>
 </main>
 
@@ -805,6 +815,11 @@ function acceso() {
                 `).join('')}
               </select>
             </label>
+            <button id="eliminarNegocio" class="danger" type="button"
+                    data-bloqueado="${negocioSeleccionado ? '0' : '1'}"
+                    ${negocioSeleccionado ? '' : 'disabled'}>
+              Eliminar emprendimiento
+            </button>
           `
           : ''
       }
@@ -1917,6 +1932,7 @@ $('#sesion').addEventListener('change', e => {
   if (e.target.id !== 'seleccionNegocio' || ocupado) return;
 
   negocioSeleccionado = e.target.value;
+  $('#eliminarNegocio').dataset.bloqueado = negocioSeleccionado ? '0' : '1';
 
   tarea(async () => {
     if (modal.open) modal.close();
@@ -1927,6 +1943,35 @@ $('#sesion').addEventListener('change', e => {
     mensaje('');
 
     await navegar(pagina);
+  });
+});
+
+$('#sesion').addEventListener('click', e => {
+  if (!e.target.closest('#eliminarNegocio') || ocupado || !esAdmin()) return;
+
+  const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
+  if (!negocio || !window.confirm(
+    `¿Eliminar «${negocio.nombre}»? Sus cuentas perderán el acceso y se conservará su historial.`
+  )) return;
+
+  tarea(async () => {
+    mensaje('');
+    const resultado = await api(
+      '/emprendimientos/' + encodeURIComponent(negocio.id),
+      'DELETE'
+    );
+
+    negocios = negocios.filter(n => n.id !== negocio.id);
+    negocioSeleccionado = '';
+    registros = [];
+    catalogo = [];
+    carrito.clear();
+    if (modal.open) modal.close();
+    acceso();
+    controles();
+
+    await navegar(pagina);
+    mensaje(resultado.mensaje);
   });
 });
 
@@ -2248,5 +2293,6 @@ if (window.innerWidth <= 800) {
 traducirAcceso();
 acceso();
 </script>
+
 </body>
 </html>
