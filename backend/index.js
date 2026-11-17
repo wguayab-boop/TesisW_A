@@ -1,1901 +1,2292 @@
-"use strict";
 
-const path = require("node:path");
-const { existsSync } = require("node:fs");
-const { loadEnvFile } = require("node:process");
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMARTMARKET GUAYAQUIL</title>
 
-const archivoEnv = path.join(__dirname, ".env");
+<style>
+*{box-sizing:border-box}
+:root{--sidebar:254px;--accent:#117c72}
+body{margin:0;background:#f4f6fa;color:#1b2d40;font:15px system-ui}
+header{background:white;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid #e2e8ef;min-height:86px}
+h1{font-size:21px;margin:0}
+h2{margin:0 0 16px}
+h3{margin:0 0 12px;font-size:18px}
+small,.muted{color:#57687d}
+main{max-width:1440px;margin:24px auto;padding:0 20px}
+button{border:0;border-radius:8px;padding:11px 16px;background:#e0e9f6;color:#183b65;font:inherit;cursor:pointer}
+button.primary{background:var(--accent);color:white}
+button.danger{background:#fff0ed;color:#b52b21}
+button:disabled{opacity:.5;cursor:wait}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #41bfa4;outline-offset:3px}
+input,select,textarea{display:block;width:100%;padding:11px;border:1px solid #b8c8dd;border-radius:7px;font:inherit;background:white}
+label{display:block;margin:12px 0}
+label span{display:block;margin-bottom:6px}
+.card{background:white;border:1px solid #e4eaf0;border-radius:16px;padding:24px;box-shadow:0 3px 16px #21394f05}
+.login{max-width:500px;margin:40px auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.metric{font-size:32px;font-weight:700;margin-top:14px;letter-spacing:-1px;color:#153c49}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:16px}
+.toolbar label{margin:0;min-width:150px;flex:1}
+.table{overflow:auto}
+table{width:100%;border-collapse:collapse;background:white}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #e5eaf2;vertical-align:top}
+th{font-size:13px;color:#526781}
+td button{padding:7px 10px;margin:2px}
+#mensaje{padding:14px;border-radius:8px;background:#e1efff;margin-bottom:18px;white-space:pre-wrap}
+#mensaje.error{background:#ffe8e3;color:#943027}
+.badge{border-radius:20px;padding:5px 9px;font-size:12px;background:#e7f5ed;color:#18613a}
+.badge.low{background:#fff0d6;color:#8c5500}
+.badge.zero{background:#ffe6e1;color:#a23027}
+dialog{border:0;border-radius:15px;padding:24px;width:min(650px,94vw);max-height:90vh;overflow:auto}
+dialog::backdrop{background:#12325880}
+.actions{display:flex;justify-content:end;gap:10px;margin-top:20px;flex-wrap:wrap}
+.empty{padding:35px;text-align:center}
+.nowrap{white-space:nowrap}
+[hidden]{display:none!important}
 
-if (existsSync(archivoEnv)) {
-  loadEnvFile(archivoEnv);
+/* Marca */
+header .marca-principal{display:flex;align-items:center;gap:15px;margin:0;line-height:1}
+.marca-simbolo{position:relative;display:grid;place-items:center;flex:none;width:62px;height:62px;border-radius:18px;background:#143f3d;color:#c4efcf;font-size:24px;font-weight:900;letter-spacing:-2px}
+.marca-punto{position:absolute;right:8px;top:8px;width:7px;height:7px;border-radius:50%;background:#e5bf6c}
+.marca-nombre{font-size:clamp(23px,2.7vw,36px);font-weight:850;letter-spacing:-1.3px;color:#153f3d}
+.marca-nombre>span{color:#198271}
+header .marca-nombre small{display:block;font-size:12px;letter-spacing:5.5px;font-weight:750;color:#4b6d62;margin:9px 0 0 3px}
+header .marca-descriptor{display:block;margin:10px 0 0 77px;font-size:12px;color:#698379}
+header button{background:#edf4f5;color:#176c63}
+
+/* Portada */
+body:not(.autenticado){background:#f5f7f6}
+body:not(.autenticado) header{padding:23px 5%}
+body:not(.autenticado) main{max-width:1440px;margin:0 auto;padding:0 5% 40px}
+.idiomas{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:20px 0}
+.idiomas label{margin:0}
+.idiomas select{width:auto}
+.acceso-portada{display:grid;grid-template-columns:1.15fr 1fr;gap:36px;align-items:stretch}
+.acceso-portada:has(#login[hidden]){display:none}
+.bienvenida-comercial{position:relative;overflow:hidden;padding:36px 40px;border-radius:24px;background:#113f3d;color:white}
+.marca-portada{margin:0 0 30px;padding-bottom:25px;border-bottom:1px solid #ffffff26}
+.marca-portada-nombre{display:block;white-space:nowrap;font-size:clamp(27px,3.2vw,43px);font-weight:900;letter-spacing:-1.8px;line-height:1.1}
+.marca-portada-nombre>span{color:#a9e1bc}
+.marca-portada-ciudad{display:block;font-size:12px;letter-spacing:7px;color:#dfcb91;margin:11px 0 0 2px;font-weight:650}
+.portada-etiqueta{display:inline-block;border:1px solid #62958a;border-radius:20px;padding:8px 12px;font-size:9px;letter-spacing:1.2px;color:#c0ebd3}
+.bienvenida-comercial h2{font-size:clamp(29px,3.1vw,43px);line-height:1.14;letter-spacing:-1.3px;margin:21px 0 18px;max-width:500px}
+.portada-descripcion{font-size:16px;line-height:1.7;color:#c6ded5;max-width:480px}
+#login.card{max-width:none;width:100%;margin:0;padding:44px;border-radius:24px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+.login-eyebrow{display:block;color:#6e8b7e;font-size:10px;font-weight:750;letter-spacing:1.8px;margin-bottom:17px}
+#login h2{font-size:36px;color:#173f3b;letter-spacing:-.8px;margin-bottom:12px}
+#login>.muted{line-height:1.6}
+#login input{min-height:54px;padding:15px;background:#f9fbfa;border:1px solid #c9d9d2;border-radius:10px;font-size:16px}
+#login label{margin:22px 0}
+#login label span{font-size:14px;font-weight:600;color:#37584f;margin-bottom:9px}
+#loginForm>button{width:100%;min-height:54px;font-weight:700;margin-top:6px;font-size:16px;background:#187566}
+#abrirRecuperacion{padding:4px 0;background:transparent;color:#176e60;text-align:left;font-size:14px}
+#abrirRegistro{width:100%;border:1px solid #bbd5c9;background:white;color:#176e60;font-weight:600;min-height:50px}
+
+/* Ilustración */
+.escena-tienda{position:relative;width:220px;height:130px;margin:30px auto 20px;background:#f2e6bb;border-radius:8px 8px 0 0;border-bottom:8px solid #0c2d2d;transform:rotate(-3deg)}
+.tienda-techo{position:absolute;top:-12px;left:-10px;width:240px;height:37px;border-radius:8px 8px 12px 12px;background:repeating-linear-gradient(90deg,#9dceaf 0 30px,#f4e9c5 30px 60px);box-shadow:0 6px 0 #00000012}
+.tienda-marca{padding-top:37px;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px;color:#244d42}
+.tienda-ventana{position:absolute;left:18px;bottom:17px;width:114px;height:55px;background:#265954;border:5px solid white;display:flex;align-items:center;justify-content:space-evenly;color:#c2ddaf;font-size:25px}
+.tienda-puerta{position:absolute;right:18px;bottom:0;width:48px;height:77px;background:#265954;border:5px solid white;border-bottom:0}
+.tienda-nota{position:absolute;right:-65px;bottom:23px;background:#fff;color:#24634f;border-radius:10px;padding:13px;box-shadow:0 8px 25px #0002;font-size:12px;font-weight:700;transform:rotate(3deg)}
+.portada-beneficios{display:flex;gap:16px;border-top:1px solid #ffffff25;padding-top:22px;margin-top:20px}
+.portada-beneficios div{flex:1}
+.portada-beneficios span{display:block;color:#a5dcbf;font-size:12px;margin-bottom:8px}
+.portada-beneficios strong{font-size:12px;font-weight:500;line-height:1.6;display:block}
+
+/* Banners */
+.banners-informativos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px}
+.banners-informativos article{padding:26px;background:#e6eee9;border-radius:16px;border:1px solid #d8e5dc}
+.banners-informativos article:nth-child(2){background:#f5eddc;border-color:#e9dfc7}
+.banners-informativos article:nth-child(3){background:#e4edf1;border-color:#d4e2e9}
+.banner-numero{font-size:10px;font-weight:700;letter-spacing:1.4px;color:#537368}
+.banners-informativos h3{margin-top:15px;font-size:18px;color:#23483e}
+.banners-informativos p{font-size:14px;line-height:1.7;color:#587166;margin-bottom:0}
+body.autenticado .banners-informativos,main:has(#login[hidden]) .banners-informativos{display:none}
+
+/* Panel */
+body.autenticado header{margin-left:var(--sidebar)}
+body.autenticado main{margin:28px 0 28px var(--sidebar);padding:0 32px;max-width:none}
+body.autenticado header .marca-simbolo{width:44px;height:44px;border-radius:13px;font-size:18px}
+body.autenticado header .marca-nombre{font-size:24px}
+body.autenticado header .marca-nombre small{font-size:9px;letter-spacing:4px;margin-top:7px}
+body.autenticado header .marca-descriptor{display:none}
+#sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar);background:#102f3c;color:#e0ecef;z-index:20;padding:28px 18px;overflow:auto;transition:transform .2s}
+.sidebrand{display:flex;gap:10px;align-items:center}
+.side-emblema{display:grid;place-items:center;flex:none;width:39px;height:43px;background:#a9e1bc;color:#123f3b;border-radius:11px;font-size:17px;font-weight:900;letter-spacing:-1px}
+.side-nombre{font-size:16px;font-weight:850;letter-spacing:-.5px;color:#fff}
+.side-nombre small{display:block;font-size:9px;letter-spacing:3px;color:#b5dac9;font-weight:650;margin-top:7px}
+.side-subtitulo{font-size:11px;color:#a1bdb8;margin:14px 0 0 49px}
+.nav-caption{font-size:10px;letter-spacing:1.8px;color:#91aeb9;margin:32px 12px 16px}
+#nav{display:flex;flex-direction:column;gap:8px}
+#nav button{width:100%;text-align:left;background:transparent;color:#bbd0d8;border-radius:10px;padding:14px 16px}
+#nav button.active{background:#196356;color:white;border-left:3px solid #79e3c9}
+#nav button:hover{background:#234956}
+.sidefooter{margin:48px 12px 0;font-size:12px;color:#91aeb9}
+#menuToggle{margin-bottom:24px;background:white;border:1px solid #dce5ed}
+body.menu-cerrado #sidebar{transform:translateX(-100%)}
+body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-left:0}
+#sesion{max-width:100%}
+#sesion select{max-width:420px}
+
+/* Dashboard */
+#datos>.grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+#datos>.grid .card{border-top:3px solid #61b8a4}
+.dashboard-bottom{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;margin-top:24px}
+.stock-row{display:flex;justify-content:space-between;flex-wrap:wrap;margin:22px 0}
+.stock-track{width:100%;height:8px;border-radius:8px;background:#eef2f5;margin-top:9px;overflow:hidden}
+.stock-track div{height:100%;border-radius:8px}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-actions button{text-align:left;background:#edf5f3;color:#17675a;padding:20px 16px}
+.inventory-alert{background:#fff5df;color:#76541d;padding:16px;border-radius:10px;line-height:1.5;margin-top:24px}
+
+/* Adaptación a pantallas */
+@media(max-width:1000px){
+  :root{--sidebar:220px}
+  body.autenticado main{padding:0 20px}
+  .dashboard-bottom{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  .acceso-portada{grid-template-columns:1fr;gap:20px}
+  .bienvenida-comercial{padding:30px}
+  .marca-portada{margin-bottom:22px;padding-bottom:20px}
+  .marca-portada-nombre{font-size:38px}
+  .escena-tienda{display:none}
+  #login.card{padding:30px}
+  .banners-informativos{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+  body.autenticado header,body.autenticado main{margin-left:0}
+  #sidebar{top:86px;box-shadow:12px 0 35px #102f3c40}
+  #datos>.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+  header{padding:16px}
+  .card{padding:18px}
+  th,td{padding:10px}
+  .toolbar label{min-width:130px}
+}
+@media(max-width:480px){
+  body:not(.autenticado) main{padding:0 16px 30px}
+  header .marca-principal{gap:11px}
+  .marca-simbolo{width:47px;height:49px;border-radius:13px;font-size:20px}
+  .marca-nombre{font-size:25px;letter-spacing:-1px}
+  header .marca-nombre small{font-size:10px;letter-spacing:4px}
+  header .marca-descriptor{margin-left:58px;font-size:10px}
+  .marca-portada-nombre{font-size:clamp(24px,8.3vw,35px)}
+  .marca-portada-ciudad{font-size:11px;letter-spacing:5px}
+  .bienvenida-comercial{padding:25px}
+  .bienvenida-comercial h2{font-size:32px}
+  #login.card{padding:26px}
+  .portada-beneficios{gap:12px}
+}
+@media(max-width:460px){
+  #datos>.grid,.quick-actions{grid-template-columns:1fr}
+  body.autenticado main{padding:0 12px}
+}
+@media(prefers-reduced-motion:reduce){
+  #sidebar{transition:none}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div>
+    <h1 class="marca-principal">
+      <span class="marca-simbolo" aria-hidden="true">
+        SM<span class="marca-punto"></span>
+      </span>
+      <span class="marca-nombre">
+        SMART<span>MARKET</span>
+        <small>GUAYAQUIL</small>
+      </span>
+    </h1>
+    <small class="marca-descriptor" data-texto="marcaDescriptor">
+      Gestión comercial para tu emprendimiento
+    </small>
+  </div>
+  <div id="sesion"></div>
+</header>
+
+<main>
+  <div class="idiomas" id="selectorAcceso">
+    <label for="idiomaSistema" data-texto="idioma">Idioma</label>
+    <select id="idiomaSistema">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+
+  <div id="mensaje" role="status" aria-live="polite" hidden></div>
+
+  <div id="accesoPortada" class="acceso-portada">
+    <div class="bienvenida-comercial">
+      <div class="marca-portada" aria-label="SMARTMARKET GUAYAQUIL">
+        <span class="marca-portada-nombre">
+          SMART<span>MARKET</span>
+        </span>
+        <span class="marca-portada-ciudad">GUAYAQUIL</span>
+      </div>
+
+      <span class="portada-etiqueta" data-texto="portadaEtiqueta">
+        HECHO PARA TU EMPRENDIMIENTO
+      </span>
+
+      <h2 data-texto="portadaTitulo">
+        Tu negocio, organizado en un solo lugar.
+      </h2>
+
+      <p class="portada-descripcion" data-texto="portadaDescripcion">
+        Productos, clientes y ventas en un mismo lugar.
+        Dedica más tiempo a tus clientes y lleva el control de cada operación.
+      </p>
+
+      <div class="escena-tienda" aria-hidden="true">
+        <div class="tienda-techo"></div>
+        <div class="tienda-marca">SMARTMARKET</div>
+        <div class="tienda-ventana">
+          <span>▣</span><span>▣</span><span>▣</span>
+        </div>
+        <div class="tienda-puerta"></div>
+        <div class="tienda-nota">
+          ✓ <span data-texto="portadaOrden">Todo en orden</span>
+        </div>
+      </div>
+
+      <div class="portada-beneficios">
+        <div>
+          <span>01</span>
+          <strong data-texto="beneficioUno">Organiza tus productos</strong>
+        </div>
+        <div>
+          <span>02</span>
+          <strong data-texto="beneficioDos">Registra tus ventas</strong>
+        </div>
+        <div>
+          <span>03</span>
+          <strong data-texto="beneficioTres">Conoce tus existencias</strong>
+        </div>
+      </div>
+    </div>
+
+    <section id="login" class="card login">
+      <span class="login-eyebrow" data-texto="loginEtiqueta">
+        TU ESPACIO DE TRABAJO
+      </span>
+      <h2 data-texto="inicio">Iniciar sesión</h2>
+      <p class="muted" data-texto="descripcionLogin">
+        Utiliza tu cuenta del sistema.
+      </p>
+
+      <form id="loginForm">
+        <label>
+          <span data-texto="correo">Correo electrónico</span>
+          <input name="correo" type="email" required
+                 maxlength="150" autocomplete="username">
+        </label>
+        <label>
+          <span data-texto="password">Contraseña</span>
+          <input name="password" type="password" required
+                 autocomplete="current-password">
+        </label>
+        <button class="primary" type="submit" data-texto="ingresar">
+          Ingresar
+        </button>
+      </form>
+
+      <p class="muted" style="margin: 12px 0; text-align: center; font-size: 0.85rem;">
+        Desarrollado por AA y WG
+      </p>
+
+      <p>
+        <button id="abrirRecuperacion" type="button" data-texto="olvido">
+          ¿Olvidaste tu contraseña?
+        </button>
+      </p>
+      <p class="muted" data-texto="sinCuenta">
+        ¿Todavía no tienes cuenta?
+      </p>
+      <button id="abrirRegistro" type="button" data-texto="crearCuenta">
+        Crear cuenta
+      </button>
+    </section>
+  </div>
+
+  <section class="banners-informativos"
+           aria-label="Funciones de SMARTMARKET">
+    <article>
+      <span class="banner-numero">01 / CATÁLOGO</span>
+      <h3 data-texto="bannerProductos">Tu catálogo, organizado</h3>
+      <p data-texto="bannerProductosInfo">
+        Consulta productos y precios desde el módulo de productos.
+      </p>
+    </article>
+    <article>
+      <span class="banner-numero">02 / INVENTARIO</span>
+      <h3 data-texto="bannerInventario">Anticípate al stock bajo</h3>
+      <p data-texto="bannerInventarioInfo">
+        Revisa existencias y registra entradas o salidas de mercadería.
+      </p>
+    </article>
+    <article>
+      <span class="banner-numero">03 / DASHBOARD</span>
+      <h3 data-texto="bannerPanel">Una mirada a tu negocio</h3>
+      <p data-texto="bannerPanelInfo">
+        Consulta las ventas del día y los indicadores de tu inventario.
+      </p>
+    </article>
+  </section>
+
+  <!-- REGISTRO -->
+  <section id="registro" class="card login" hidden>
+    <h2 data-texto="crearCuenta">Crear cuenta</h2>
+    <p class="muted" data-texto="descripcionRegistro">
+      Registra tus datos para ingresar a SMARTMARKET GUAYAQUIL.
+    </p>
+
+    <form id="registroForm">
+      <label>
+        <span data-texto="nombre">Nombre del responsable</span>
+        <input name="nombre" required maxlength="100" autocomplete="name">
+      </label>
+
+      <label>
+        <span data-texto="tienda">Nombre de la tienda</span>
+        <input name="tienda" required maxlength="150"
+               autocomplete="organization">
+      </label>
+
+      <label>
+        <span data-texto="categoria">Categoría del negocio</span>
+        <select name="categoria" required>
+          <option value="" data-texto="seleccionarCategoria">
+            Selecciona una categoría
+          </option>
+          <option value="Abarrotes" data-texto="catAbarrotes">
+            Abarrotes
+          </option>
+          <option value="Ropa y accesorios" data-texto="catRopa">
+            Ropa y accesorios
+          </option>
+          <option value="Tecnología" data-texto="catTecnologia">
+            Tecnología
+          </option>
+          <option value="Alimentos y bebidas" data-texto="catAlimentos">
+            Alimentos y bebidas
+          </option>
+          <option value="Belleza y cuidado personal" data-texto="catBelleza">
+            Belleza y cuidado personal
+          </option>
+          <option value="Ferretería" data-texto="catFerreteria">
+            Ferretería
+          </option>
+          <option value="Otros" data-texto="catOtros">
+            Otros
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span data-texto="correo">Correo electrónico</span>
+        <input name="correo" type="email" required maxlength="150"
+               autocomplete="email">
+      </label>
+
+      <label>
+        <span data-texto="password">Contraseña</span>
+        <input name="password" type="password" required minlength="8"
+               autocomplete="new-password" aria-describedby="ayudaClave">
+      </label>
+
+      <small id="ayudaClave" data-texto="ayuda">
+        Mínimo 8 caracteres y máximo 72 bytes.
+      </small>
+
+      <label>
+        <span data-texto="confirmar">Confirmar contraseña</span>
+        <input name="confirmacion" type="password" required minlength="8"
+               autocomplete="new-password">
+      </label>
+
+      <button class="primary" type="submit" data-texto="registrarse">
+        Registrarse
+      </button>
+    </form>
+
+    <p class="muted" data-texto="yaCuenta">¿Ya tienes cuenta?</p>
+    <button id="volverLogin" type="button" data-texto="volver">
+      Volver a iniciar sesión
+    </button>
+  </section>
+
+  <!-- RECUPERACIÓN -->
+  <section id="recuperarCuenta" class="card login" hidden>
+    <h2 data-texto="recuperar">Recuperar contraseña</h2>
+    <p class="muted" data-texto="recuperacionInfo">
+      Escribe el correo con el que registraste tu cuenta.
+    </p>
+
+    <form id="formRecuperar">
+      <label>
+        <span data-texto="correo">Correo electrónico</span>
+        <input name="correo" type="email" required maxlength="150"
+               autocomplete="email">
+      </label>
+      <button class="primary" type="submit" data-texto="enviar">
+        Enviar enlace
+      </button>
+    </form>
+
+    <p>
+      <button type="button" id="volverDesdeRecuperar" data-texto="volver">
+        Volver a iniciar sesión
+      </button>
+    </p>
+  </section>
+
+  <section id="restablecerCuenta" class="card login" hidden>
+    <h2 data-texto="nueva">Crear nueva contraseña</h2>
+
+    <form id="formNueva">
+      <label>
+        <span data-texto="nuevaPassword">Nueva contraseña</span>
+        <input name="password" type="password" required minlength="8"
+               autocomplete="new-password">
+      </label>
+      <label>
+        <span data-texto="confirmar">Confirmar contraseña</span>
+        <input name="confirmacion" type="password" required minlength="8"
+               autocomplete="new-password">
+      </label>
+      <button class="primary" type="submit" data-texto="guardarClave">
+        Guardar contraseña
+      </button>
+    </form>
+
+    <p>
+      <button type="button" id="volverDesdeNueva" data-texto="volver">
+        Volver a iniciar sesión
+      </button>
+    </p>
+  </section>
+
+  <!-- PANEL -->
+  <section id="app" hidden>
+    <aside id="sidebar">
+      <div class="sidebrand">
+        <span class="side-emblema" aria-hidden="true">SM</span>
+        <span class="side-nombre">
+          SMARTMARKET
+          <small>GUAYAQUIL</small>
+        </span>
+      </div>
+      <p class="side-subtitulo">Panel administrativo</p>
+      <p class="nav-caption">GESTIÓN COMERCIAL</p>
+      <nav id="nav" aria-label="Módulos administrativos"></nav>
+      <p class="sidefooter">Tu negocio, bajo control.</p>
+    </aside>
+
+    <button id="menuToggle" type="button"
+            aria-controls="sidebar" aria-expanded="true">
+      ☰ Menú
+    </button>
+
+    <div id="contenido"></div>
+  </section>
+</main>
+
+<dialog id="modal">
+  <div id="modalContenido"></div>
+</dialog>
+
+<script>
+'use strict';
+
+/* UTILIDADES */
+
+const $ = s => document.querySelector(s);
+
+const E = v => String(v ?? '').replace(
+  /[&<>"']/g,
+  c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c])
+);
+
+const API = location.protocol === 'file:'
+  ? 'http://localhost:3000'
+  : location.origin;
+
+let token = '';
+let usuario = null;
+let negocios = [];
+let negocioSeleccionado = '';
+let pagina = 'resumen';
+let vistaAcceso = 'login';
+let ocupado = false;
+let registros = [];
+let catalogo = [];
+let carrito = new Map();
+let idioma = 'es';
+
+const esAdmin = () => usuario?.rol === 'administrador';
+
+try {
+  idioma = localStorage.getItem('smartmarket_idioma') === 'en'
+    ? 'en'
+    : 'es';
+} catch (_) {
+  idioma = 'es';
 }
 
-const express = require("express");
-const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const pool = require("./db");
+/* TEXTOS DEL ACCESO */
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const textos = {
+  es: {
+    marcaDescriptor: 'Gestión comercial para tu emprendimiento',
+    loginEtiqueta: 'TU ESPACIO DE TRABAJO',
+    portadaEtiqueta: 'HECHO PARA TU EMPRENDIMIENTO',
+    portadaTitulo: 'Tu negocio, organizado en un solo lugar.',
+    portadaDescripcion:
+      'Productos, clientes y ventas en un mismo lugar. Dedica más tiempo a tus clientes y lleva el control de cada operación.',
+    portadaOrden: 'Todo en orden',
+    beneficioUno: 'Organiza tus productos',
+    beneficioDos: 'Registra tus ventas',
+    beneficioTres: 'Conoce tus existencias',
+    bannerProductos: 'Tu catálogo, organizado',
+    bannerProductosInfo:
+      'Consulta productos y precios desde el módulo de productos.',
+    bannerInventario: 'Anticípate al stock bajo',
+    bannerInventarioInfo:
+      'Revisa existencias y registra entradas o salidas de mercadería.',
+    bannerPanel: 'Una mirada a tu negocio',
+    bannerPanelInfo:
+      'Consulta las ventas del día y los indicadores de tu inventario.',
+    idioma: 'Idioma',
+    inicio: 'Iniciar sesión',
+    descripcionLogin: 'Utiliza tu cuenta del sistema.',
+    correo: 'Correo electrónico',
+    password: 'Contraseña',
+    ingresar: 'Ingresar',
+    sinCuenta: '¿Todavía no tienes cuenta?',
+    crearCuenta: 'Crear cuenta',
+    descripcionRegistro:
+      'Registra tus datos para ingresar a SMARTMARKET GUAYAQUIL.',
+    nombre: 'Nombre del responsable',
+    tienda: 'Nombre de la tienda',
+    categoria: 'Categoría del negocio',
+    seleccionarCategoria: 'Selecciona una categoría',
+    catAbarrotes: 'Abarrotes',
+    catRopa: 'Ropa y accesorios',
+    catTecnologia: 'Tecnología',
+    catAlimentos: 'Alimentos y bebidas',
+    catBelleza: 'Belleza y cuidado personal',
+    catFerreteria: 'Ferretería',
+    catOtros: 'Otros',
+    confirmar: 'Confirmar contraseña',
+    ayuda:
+      'Mínimo 8 caracteres y máximo 72 bytes. Las tildes y los emojis pueden ocupar varios bytes.',
+    registrarse: 'Registrarse',
+    yaCuenta: '¿Ya tienes cuenta?',
+    volver: 'Volver a iniciar sesión',
+    olvido: '¿Olvidaste tu contraseña?',
+    recuperar: 'Recuperar contraseña',
+    recuperacionInfo: 'Escribe el correo con el que registraste tu cuenta.',
+    enviar: 'Enviar enlace',
+    nueva: 'Crear nueva contraseña',
+    nuevaPassword: 'Nueva contraseña',
+    guardarClave: 'Guardar contraseña',
+    noCoinciden: 'Las contraseñas no coinciden.',
+    invalida:
+      'La contraseña debe tener al menos 8 caracteres y máximo 72 bytes.',
+    enviado:
+      'Si el correo está registrado, recibirás instrucciones para recuperar tu contraseña.',
+    actualizado: 'Contraseña actualizada. Ya puedes iniciar sesión.',
+    enlaceInvalido: 'El enlace no es válido, ya fue usado o caducó.',
+    errorRed:
+      'No se pudo confirmar la respuesta. Comprueba que el backend esté encendido.',
+    errorGeneral: 'No se pudo completar la operación.',
+    errorRespuesta: 'Respuesta inesperada del servidor.',
+    nombreObligatorio: 'Ingresa tu nombre completo.',
+    cuentaCreada: 'Cuenta creada correctamente. Ya puedes iniciar sesión.',
+    correoDuplicado: 'Ese correo ya está registrado.',
+    credenciales: 'Correo o contraseña incorrectos.',
+    tokenInvalido: 'Token de acceso inválido.',
+    perfilInvalido: 'No se pudo comprobar el perfil del usuario.',
+    revisarRegistro:
+      ' Intenta iniciar sesión con esos datos antes de repetir el registro.',
+    correoNoConfigurado: 'El envío de correo aún no está configurado.',
+    demasiadosIntentos:
+      'Demasiados intentos. Vuelve a intentarlo más tarde.',
+    sesionCerrada: 'Sesión cerrada.'
+  },
+  en: {
+    marcaDescriptor: 'Business management for your small business',
+    loginEtiqueta: 'YOUR WORKSPACE',
+    portadaEtiqueta: 'MADE FOR YOUR SMALL BUSINESS',
+    portadaTitulo: 'Your business, organized in one place.',
+    portadaDescripcion:
+      'Products, customers and sales in one place. Spend more time with your customers and keep track of every transaction.',
+    portadaOrden: 'Everything in order',
+    beneficioUno: 'Organize your products',
+    beneficioDos: 'Record your sales',
+    beneficioTres: 'Track your stock',
+    bannerProductos: 'Your catalog, organized',
+    bannerProductosInfo: 'Check products and prices in the products module.',
+    bannerInventario: 'Stay ahead of low stock',
+    bannerInventarioInfo:
+      'Check stock levels and record incoming or outgoing goods.',
+    bannerPanel: 'A view of your business',
+    bannerPanelInfo: "Check today's sales and your inventory indicators.",
+    idioma: 'Language',
+    inicio: 'Sign in',
+    descripcionLogin: 'Use your system account.',
+    correo: 'Email address',
+    password: 'Password',
+    ingresar: 'Sign in',
+    sinCuenta: "Don't have an account?",
+    crearCuenta: 'Create account',
+    descripcionRegistro: 'Enter your details to join SMARTMARKET GUAYAQUIL.',
+    nombre: 'Account holder name',
+    tienda: 'Store name',
+    categoria: 'Business category',
+    seleccionarCategoria: 'Select a category',
+    catAbarrotes: 'Groceries',
+    catRopa: 'Clothing and accessories',
+    catTecnologia: 'Technology',
+    catAlimentos: 'Food and drinks',
+    catBelleza: 'Beauty and personal care',
+    catFerreteria: 'Hardware store',
+    catOtros: 'Other',
+    confirmar: 'Confirm password',
+    ayuda:
+      'At least 8 characters and at most 72 bytes. Accented letters and emojis may use several bytes.',
+    registrarse: 'Register',
+    yaCuenta: 'Already have an account?',
+    volver: 'Back to sign in',
+    olvido: 'Forgot your password?',
+    recuperar: 'Reset password',
+    recuperacionInfo: 'Enter the email address used to create your account.',
+    enviar: 'Send link',
+    nueva: 'Create a new password',
+    nuevaPassword: 'New password',
+    guardarClave: 'Save password',
+    noCoinciden: 'Passwords do not match.',
+    invalida:
+      'The password must have at least 8 characters and at most 72 bytes.',
+    enviado:
+      'If the email is registered, you will receive password recovery instructions.',
+    actualizado: 'Password updated. You can now sign in.',
+    enlaceInvalido: 'The link is invalid, has already been used, or has expired.',
+    errorRed:
+      'The response could not be confirmed. Check that the backend is running.',
+    errorGeneral: 'The operation could not be completed.',
+    errorRespuesta: 'Unexpected server response.',
+    nombreObligatorio: 'Enter your full name.',
+    cuentaCreada: 'Account created. You can now sign in.',
+    correoDuplicado: 'That email address is already registered.',
+    credenciales: 'Incorrect email address or password.',
+    tokenInvalido: 'Invalid access token.',
+    perfilInvalido: 'The user profile could not be verified.',
+    revisarRegistro:
+      ' Try signing in with these details before registering again.',
+    correoNoConfigurado: 'Email delivery has not been configured yet.',
+    demasiadosIntentos: 'Too many attempts. Please try again later.',
+    sesionCerrada: 'You have signed out.'
+  }
+};
 
-if (!JWT_SECRET || JWT_SECRET.length < 64) {
-  throw new Error(
-    "Falta una clave JWT_SECRET válida en .env o en las variables del alojamiento"
+function t(clave) {
+  return textos[idioma][clave] || clave;
+}
+
+function traducirAcceso() {
+  document.documentElement.lang = idioma;
+
+  document.querySelectorAll('[data-texto]').forEach(el => {
+    el.textContent = t(el.dataset.texto);
+  });
+
+  $('#idiomaSistema').value = idioma;
+}
+
+function mensaje(texto, error = false) {
+  $('#mensaje').hidden = !texto;
+  $('#mensaje').textContent = texto;
+  $('#mensaje').className = error ? 'error' : '';
+}
+
+const secciones = {
+  resumen: 'Dashboard',
+  productos: 'Productos',
+  clientes: 'Clientes',
+  inventario: 'Inventario',
+  historial: 'Historial',
+  ventas: 'Ventas'
+};
+
+const modal = $('#modal');
+
+const money = v => new Intl.NumberFormat('es-EC', {
+  style: 'currency',
+  currency: 'USD'
+}).format(Number(v));
+
+const fecha = v => new Intl.DateTimeFormat('es-EC', {
+  timeZone: 'America/Guayaquil',
+  dateStyle: 'short',
+  timeStyle: 'short'
+}).format(new Date(v));
+
+/* ENLACE DE RECUPERACIÓN */
+
+const parametros = new URLSearchParams(location.search);
+let tokenRecuperacion = parametros.get('reset') || '';
+
+if (parametros.has('reset')) {
+  parametros.delete('reset');
+  const resto = parametros.toString();
+
+  history.replaceState(
+    {},
+    '',
+    location.pathname + (resto ? '?' + resto : '') + location.hash
   );
 }
 
-const CATEGORIAS = [
-  "Abarrotes",
-  "Ropa y accesorios",
-  "Tecnología",
-  "Alimentos y bebidas",
-  "Belleza y cuidado personal",
-  "Ferretería",
-  "Otros"
-];
+if (tokenRecuperacion) {
+  vistaAcceso = 'restablecer';
+}
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+/* CONTROL DE PANTALLAS */
 
-app.use(cors());
-app.use(express.json());
+function acceso() {
+  const dentro = !!token && !!usuario;
 
-app.use(
-  "/admin",
-  express.static(path.join(__dirname, "public"))
-);
+  document.body.classList.toggle('autenticado', dentro);
 
-// ============================================================
-// ESTADO DEL SERVIDOR
-// ============================================================
+  $('#login').hidden = dentro || vistaAcceso !== 'login';
+  $('#registro').hidden = dentro || vistaAcceso !== 'registro';
+  $('#recuperarCuenta').hidden = dentro || vistaAcceso !== 'recuperar';
+  $('#restablecerCuenta').hidden = dentro || vistaAcceso !== 'restablecer';
+  $('#app').hidden = !dentro;
+  $('#selectorAcceso').hidden = dentro;
 
-app.get("/", (req, res) => {
-  return res.json({
-    mensaje: "API de SMARTMARKET-GUAYAQUIL funcionando correctamente"
+  $('#sesion').innerHTML = dentro
+    ? `
+      ${E(usuario.nombre)} · ${E(usuario.rol)}
+      <div class="muted">
+        ${
+          esAdmin()
+            ? 'Consulta general de los emprendimientos'
+            : E(usuario.tienda) + ' · ' + E(usuario.categoria)
+        }
+      </div>
+
+      ${
+        esAdmin()
+          ? `
+            <label>
+              Emprendimiento
+              <select id="seleccionNegocio" style="width: 250px; max-width: 100%;">
+                <option value="">Todos los emprendimientos</option>
+                ${negocios.map(n => `
+                  <option value="${E(n.id)}"
+                    ${String(n.id) === negocioSeleccionado ? 'selected' : ''}>
+                    ${E(n.nombre)} · ${E(n.categoria)}
+                  </option>
+                `).join('')}
+              </select>
+            </label>
+            <button id="eliminarNegocio" class="danger" type="button"
+                    data-bloqueado="${negocioSeleccionado ? '0' : '1'}"
+                    ${negocioSeleccionado ? '' : 'disabled'}>
+              Eliminar emprendimiento
+            </button>
+          `
+          : ''
+      }
+
+      <button id="salir">Cerrar sesión</button>
+    `
+    : '';
+}
+
+function vistaFormulario(vista) {
+  if (ocupado) return;
+
+  vistaAcceso = vista;
+  acceso();
+  mensaje('');
+
+  const formularios = {
+    login: '#loginForm',
+    registro: '#registroForm',
+    recuperar: '#formRecuperar',
+    restablecer: '#formNueva'
+  };
+
+  $(formularios[vista])?.querySelector('input')?.focus();
+}
+
+function controles() {
+  document.querySelectorAll('button').forEach(b => {
+    b.disabled = ocupado || b.dataset.bloqueado === '1';
   });
-});
 
-app.get("/test-db", async (req, res) => {
+  $('#idiomaSistema').disabled = ocupado;
+
+  if ($('#seleccionNegocio')) {
+    $('#seleccionNegocio').disabled = ocupado;
+  }
+}
+
+async function tarea(fn) {
+  if (ocupado) return;
+
+  ocupado = true;
+  controles();
+
   try {
-    const resultado = await pool.query("SELECT NOW() AS fecha");
-
-    return res.json({
-      mensaje: "Conexión con PostgreSQL exitosa",
-      fecha: resultado.rows[0].fecha
-    });
+    await fn();
   } catch (error) {
-    console.error("Error de conexión con PostgreSQL:", error.message);
+    mensaje(error.message, true);
+  } finally {
+    ocupado = false;
+    controles();
+  }
+}
 
-    return res.status(500).json({
-      mensaje: "No se pudo conectar con PostgreSQL"
+/* SOLICITUDES AL BACKEND */
+
+function mensajeServidor(ruta, estado, recibido) {
+  if (idioma === 'es') {
+    return recibido || t('errorGeneral');
+  }
+
+  if (ruta === '/login' && estado === 401) {
+    return t('credenciales');
+  }
+
+  if (ruta === '/registro' && estado === 409) {
+    return t('correoDuplicado');
+  }
+
+  if (ruta === '/restablecer-password' && estado === 400) {
+    return t('enlaceInvalido');
+  }
+
+  if (ruta === '/recuperar-password' && estado === 503) {
+    return t('correoNoConfigurado');
+  }
+
+  if (estado === 429) {
+    return t('demasiadosIntentos');
+  }
+
+  if (
+    [
+      '/login',
+      '/registro',
+      '/recuperar-password',
+      '/restablecer-password',
+      '/perfil'
+    ].includes(ruta)
+  ) {
+    return t('errorGeneral');
+  }
+
+  return recibido || t('errorGeneral');
+}
+
+async function api(ruta, metodo = 'GET', datos) {
+  const muta = metodo !== 'GET' && ruta !== '/login';
+  const controlador = new AbortController();
+  const temporizador = setTimeout(() => controlador.abort(), 30000);
+
+  try {
+    const respuesta = await fetch(API + ruta, {
+      method: metodo,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+        ...(
+          esAdmin() && negocioSeleccionado
+            ? { 'X-Emprendimiento': negocioSeleccionado }
+            : {}
+        )
+      },
+      ...(datos ? { body: JSON.stringify(datos) } : {}),
+      signal: controlador.signal
+    });
+
+    let resultado;
+
+    try {
+      resultado = await respuesta.json();
+    } catch (_) {
+      throw Object.assign(
+        Error(t('errorRespuesta')),
+        { incierto: muta }
+      );
+    }
+
+    if (!respuesta.ok) {
+      if (respuesta.status === 401 && token) {
+        token = '';
+        usuario = null;
+        vistaAcceso = 'login';
+
+        if (modal.open) modal.close();
+        acceso();
+      }
+
+      throw Object.assign(
+        Error(
+          mensajeServidor(ruta, respuesta.status, resultado.mensaje)
+        ),
+        { incierto: muta && respuesta.status >= 500 }
+      );
+    }
+
+    return resultado;
+  } catch (error) {
+    if (
+      error instanceof TypeError ||
+      error.name === 'AbortError'
+    ) {
+      throw Object.assign(
+        Error(t('errorRed')),
+        { incierto: muta }
+      );
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(temporizador);
+  }
+}
+
+/* TABLAS Y VENTANAS */
+
+function tabla(titulos, filas) {
+  return filas.length
+    ? `
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              ${titulos.map(titulo => `<th>${E(titulo)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>${filas.join('')}</tbody>
+        </table>
+      </div>
+    `
+    : '<div class="card empty">No hay registros con estos filtros.</div>';
+}
+
+function boton(accion, id, texto, clase = '') {
+  if (esAdmin() && accion !== 'detalle') return '';
+
+  return `
+    <button class="${clase}"
+            data-accion="${accion}"
+            data-id="${E(id)}">${texto}</button>
+  `;
+}
+
+function abrir(html) {
+  $('#modalContenido').innerHTML = html + `
+    <div class="actions">
+      <button id="cerrarModal">Cerrar</button>
+    </div>
+  `;
+
+  modal.showModal();
+  controles();
+}
+
+function filtros() {
+  return `
+    <form id="filtros" class="toolbar">
+      <label>
+        <span>${
+          pagina === 'ventas'
+            ? 'Cliente o número de venta'
+            : 'Nombre del producto'
+        }</span>
+        <input name="busqueda" maxlength="150">
+      </label>
+
+      <label>
+        <span>Desde</span>
+        <input name="desde" type="date">
+      </label>
+
+      <label>
+        <span>Hasta</span>
+        <input name="hasta" type="date">
+      </label>
+
+      <button class="primary">Buscar</button>
+      <button type="button" id="limpiar">Limpiar</button>
+    </form>
+
+    <p class="muted">Hasta 200 registros · fechas de Ecuador.</p>
+  `;
+}
+
+function consulta() {
+  const formularioActual = $('#filtros');
+  if (!formularioActual) return '';
+
+  const datos = Object.fromEntries(new FormData(formularioActual));
+
+  if (datos.desde && datos.hasta && datos.desde > datos.hasta) {
+    throw Error('Revisa el intervalo de fechas.');
+  }
+
+  return '?' + new URLSearchParams(datos);
+}
+
+/* CARGA DEL PANEL */
+
+async function cargar() {
+  const ruta = pagina === 'historial'
+    ? '/inventario/historial'
+    : '/' + pagina;
+
+  const datos = await api(
+    ruta + (
+      ['ventas', 'historial'].includes(pagina)
+        ? consulta()
+        : ''
+    )
+  );
+
+  if (pagina === 'resumen') {
+    const resumen = datos.resumen;
+
+    if (!resumen || typeof resumen !== 'object') {
+      throw Error('El servidor no devolvió un resumen válido.');
+    }
+
+    const metricas = [
+      ['Ventas de hoy', resumen.ventas_hoy],
+      ['Total vendido hoy', money(resumen.total_hoy)],
+      ['Clientes activos', resumen.clientes],
+      ['Productos activos', resumen.productos],
+      ['Sin existencias', resumen.sin_stock],
+      ['Stock bajo (1 a 5)', resumen.stock_bajo]
+    ];
+
+    const nombreSeleccionado = negocios.find(
+      n => String(n.id) === negocioSeleccionado
+    )?.nombre || '';
+
+    $('#datos').innerHTML = `
+      <article class="card"
+               style="margin-bottom:22px;background:#eaf6f1">
+        <h3>Bienvenido, ${E(usuario.nombre)}</h3>
+        <p class="muted">
+          ${
+            esAdmin()
+              ? 'Consulta de ventas e inventario de ' +
+                (
+                  negocioSeleccionado
+                    ? E(nombreSeleccionado)
+                    : 'todos los emprendimientos'
+                ) +
+                '. Acceso de consulta.'
+              : E(usuario.tienda) + ' · ' + E(usuario.categoria) +
+                '. Tus datos pertenecen únicamente a tu emprendimiento.'
+          }
+        </p>
+      </article>
+
+      <div class="grid">
+        ${metricas.map(([nombre, valor]) => `
+          <article class="card">
+            <div class="muted">${E(nombre)}</div>
+            <div class="metric">${E(valor)}</div>
+          </article>
+        `).join('')}
+      </div>
+
+      <div class="dashboard-bottom">
+        <article class="card">
+          <h3>Estado del inventario</h3>
+          <p class="muted">Productos activos por disponibilidad</p>
+
+          ${[
+            [
+              'Disponible',
+              Math.max(
+                0,
+                Number(resumen.productos) -
+                Number(resumen.sin_stock) -
+                Number(resumen.stock_bajo)
+              ),
+              '#168b77'
+            ],
+            ['Stock bajo', Number(resumen.stock_bajo), '#e9a23b'],
+            ['Sin existencias', Number(resumen.sin_stock), '#d85c63']
+          ].map(([nombre, cantidad, color]) => `
+            <div class="stock-row">
+              <span>${E(nombre)}</span>
+              <strong>${E(cantidad)}</strong>
+              <div class="stock-track"
+                   role="img"
+                   aria-label="${E(nombre)}: ${E(cantidad)} productos">
+                <div style="width:${
+                  Number(resumen.productos) > 0
+                    ? Math.min(
+                        100,
+                        cantidad / Number(resumen.productos) * 100
+                      )
+                    : 0
+                }%;background:${color}"></div>
+              </div>
+            </div>
+          `).join('')}
+
+          <button type="button" data-ir="inventario">
+            Revisar inventario →
+          </button>
+        </article>
+
+        <article class="card">
+          <h3>Accesos rápidos</h3>
+          <p class="muted">Las tareas de tu negocio, a un clic.</p>
+
+          <div class="quick-actions">
+            <button type="button" data-ir="ventas">Ventas →</button>
+            <button type="button" data-ir="productos">Productos →</button>
+            <button type="button" data-ir="clientes">Clientes →</button>
+            <button type="button" data-ir="historial">Movimientos →</button>
+          </div>
+
+          <p class="inventory-alert">
+            ${
+              Number(resumen.sin_stock) + Number(resumen.stock_bajo) > 0
+                ? E(
+                    Number(resumen.sin_stock) +
+                    Number(resumen.stock_bajo)
+                  ) + ' productos necesitan revisión de existencias.'
+                : 'No hay alertas de existencias.'
+            }
+          </p>
+        </article>
+      </div>
+
+      <p class="muted">
+        Ventas de hoy en Ecuador, excluyendo las anuladas.
+        Stock bajo: de 1 a 5 unidades.
+      </p>
+      <p class="muted">
+        Última consulta: ${E(fecha(new Date()))}.
+        Usa Actualizar para consultar cambios.
+      </p>
+    `;
+
+    return;
+  }
+
+  const clave = pagina === 'historial'
+    ? 'movimientos'
+    : pagina;
+
+  if (!Array.isArray(datos[clave])) {
+    throw Error('El servidor no devolvió una lista válida.');
+  }
+
+  registros = datos[clave];
+  dibujar();
+}
+
+function dibujar() {
+  let filas = [];
+  let titulos = [];
+
+  const busqueda = ($('#buscarLocal')?.value || '').toLowerCase();
+
+  const lista = registros.filter(registro =>
+    [
+      registro.nombre,
+      registro.identificacion,
+      registro.telefono
+    ].join(' ').toLowerCase().includes(busqueda)
+  );
+
+  if (pagina === 'productos') {
+    titulos = ['Producto', 'Descripción', 'Precio', 'Acciones'];
+
+    filas = lista.map(r => `
+      <tr>
+        <td>${E(r.nombre)}</td>
+        <td>${E(r.descripcion)}</td>
+        <td>${money(r.precio)}</td>
+        <td class="nowrap">
+          ${boton('editar', r.id, 'Editar')}
+          ${boton('desactivar', r.id, 'Desactivar', 'danger')}
+        </td>
+      </tr>
+    `);
+  }
+
+  if (pagina === 'clientes') {
+    titulos = ['Cliente', 'Identificación', 'Contacto', 'Acciones'];
+
+    filas = lista.map(r => `
+      <tr>
+        <td>
+          ${E(r.nombre)}<br>
+          <small>${E(r.direccion)}</small>
+        </td>
+        <td>${E(r.identificacion)}</td>
+        <td>${E(r.telefono)}<br>${E(r.correo)}</td>
+        <td class="nowrap">
+          ${boton('editar', r.id, 'Editar')}
+          ${boton('desactivar', r.id, 'Desactivar', 'danger')}
+        </td>
+      </tr>
+    `);
+  }
+
+  if (pagina === 'inventario') {
+    titulos = ['Producto', 'Existencias', 'Estado', 'Acciones'];
+
+    filas = lista.map(r => {
+      const existencia = Number(r.existencia);
+
+      const clase = existencia === 0
+        ? 'zero'
+        : existencia <= 5 ? 'low' : '';
+
+      const estado = existencia === 0
+        ? 'Sin stock'
+        : existencia <= 5 ? 'Stock bajo' : 'Disponible';
+
+      return `
+        <tr>
+          <td>${E(r.nombre)}</td>
+          <td>${E(existencia)}</td>
+          <td><span class="badge ${clase}">${estado}</span></td>
+          <td>
+            ${boton('movimiento', r.producto_id, 'Entrada / salida')}
+          </td>
+        </tr>
+      `;
     });
   }
+
+  if (pagina === 'ventas') {
+    titulos = [
+      'Venta',
+      'Cliente',
+      'Registrada por',
+      'Fecha',
+      'Estado',
+      'Total',
+      'Acciones'
+    ];
+
+    filas = lista.map(r => `
+      <tr>
+        <td>#${E(r.id)}</td>
+        <td>${E(r.cliente_nombre)}</td>
+        <td>${E(r.usuario_nombre)}</td>
+        <td>${fecha(r.fecha_creacion)}</td>
+        <td>${E(r.estado)}</td>
+        <td>${money(r.total)}</td>
+        <td>${boton('detalle', r.id, 'Ver detalle')}</td>
+      </tr>
+    `);
+  }
+
+  if (pagina === 'historial') {
+    titulos = [
+      'Fecha',
+      'Producto',
+      'Movimiento',
+      'Antes → después',
+      'Motivo',
+      'Responsable'
+    ];
+
+    filas = lista.map(r => `
+      <tr>
+        <td>${fecha(r.fecha)}</td>
+        <td>${E(r.nombre)}</td>
+        <td>${E(r.tipo)} · ${E(r.cantidad)}</td>
+        <td>${E(r.existencia_anterior)} → ${E(r.existencia_nueva)}</td>
+        <td>${E(r.motivo)}</td>
+        <td>${E(r.usuario_nombre)}</td>
+      </tr>
+    `);
+  }
+
+  if (esAdmin()) {
+    titulos.unshift('Tienda');
+
+    filas = filas.map((fila, i) =>
+      fila.replace(
+        '<tr>',
+        `<tr><td>${E(lista[i].tienda)}</td>`
+      )
+    );
+  }
+
+  $('#datos').innerHTML = tabla(titulos, filas);
+  controles();
+}
+
+async function navegar(p) {
+  pagina = p;
+
+  $('#nav').innerHTML = Object.entries(secciones)
+    .map(([clave, nombre]) => `
+      <button data-pagina="${clave}"
+              class="${clave === p ? 'active' : ''}">
+        ${nombre}
+      </button>
+    `).join('');
+
+  const puedeCrear = !esAdmin() &&
+    ['productos', 'clientes', 'ventas'].includes(p);
+
+  const textoCrear = p === 'ventas'
+    ? 'Nueva venta'
+    : p === 'clientes' ? 'Crear cliente' : 'Crear producto';
+
+  $('#contenido').innerHTML = `
+    <div class="toolbar">
+      <h2>${secciones[p]}</h2>
+      <button id="actualizar">Actualizar</button>
+      ${
+        puedeCrear
+          ? `<button id="nuevo" class="primary">${textoCrear}</button>`
+          : ''
+      }
+    </div>
+
+    ${
+      ['ventas', 'historial'].includes(p)
+        ? filtros()
+        : p !== 'resumen'
+          ? `
+            <label>
+              <span>Buscar</span>
+              <input id="buscarLocal"
+                     placeholder="Nombre del producto o cliente">
+            </label>
+          `
+          : ''
+    }
+
+    <div id="datos" aria-live="polite">Cargando...</div>
+  `;
+
+  controles();
+
+  try {
+    await cargar();
+  } catch (error) {
+    $('#datos').innerHTML = `
+      <div class="card empty">
+        No se pudieron cargar los datos.
+        Revisa el mensaje y pulsa Actualizar.
+      </div>
+    `;
+
+    throw error;
+  }
+}
+
+/* PRODUCTOS Y CLIENTES */
+
+function campo(
+  clave,
+  titulo,
+  valor = '',
+  maximo = 150,
+  tipo = 'text',
+  requerido = false
+) {
+  return `
+    <label>
+      <span>${titulo}</span>
+      <input name="${clave}"
+             type="${tipo}"
+             value="${E(valor)}"
+             maxlength="${maximo}"
+             ${requerido ? 'required' : ''}>
+    </label>
+  `;
+}
+
+function formulario(registro) {
+  const cliente = pagina === 'clientes';
+
+  abrir(`
+    <h2>${
+      registro
+        ? 'Editar'
+        : cliente ? 'Crear cliente' : 'Crear producto'
+    }</h2>
+
+    <form id="guardarCatalogo" data-id="${registro?.id || ''}">
+      ${campo('nombre', 'Nombre', registro?.nombre, 150, 'text', true)}
+
+      ${
+        cliente
+          ? campo(
+              'identificacion',
+              'Identificación',
+              registro?.identificacion,
+              20
+            ) +
+            campo('telefono', 'Teléfono', registro?.telefono, 30) +
+            campo('correo', 'Correo', registro?.correo, 150, 'email') +
+            campo('direccion', 'Dirección', registro?.direccion, 250)
+          : campo(
+              'descripcion',
+              'Descripción',
+              registro?.descripcion,
+              1000
+            ) +
+            campo(
+              'precio',
+              'Precio',
+              registro?.precio,
+              13,
+              'text',
+              true
+            )
+      }
+
+      <button class="primary" type="submit">Guardar</button>
+    </form>
+    
+  `);
+}
+
+/* INVENTARIO */
+
+function movimiento(registro) {
+  abrir(`
+    <h2>Movimiento de inventario</h2>
+    <p>
+      ${E(registro.nombre)}
+      · Existencias: ${E(registro.existencia)}
+    </p>
+
+    <form id="guardarMovimiento" data-id="${registro.producto_id}">
+      <label>
+        <span>Tipo</span>
+        <select name="tipo">
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Cantidad</span>
+        <input name="cantidad" type="number"
+               min="1" max="2147483647" step="1" required>
+      </label>
+
+      ${campo('motivo', 'Motivo', '', 250, 'text', true)}
+      <button class="primary">Guardar movimiento</button>
+    </form>
+  `);
+}
+
+/* VENTAS */
+
+async function detalle(id) {
+  const datos = await api('/ventas/' + id);
+  const venta = datos.venta;
+
+  abrir(`
+    <h2>Venta #${E(id)}</h2>
+
+    <p>
+      Tienda: ${E(venta.tienda)}<br>
+      Registrada por: ${E(venta.usuario_nombre)}<br>
+      Cliente: ${E(venta.cliente_nombre)}<br>
+      Estado: ${E(venta.estado)}<br>
+      Fecha: ${fecha(venta.fecha_creacion)}
+    </p>
+
+    ${
+      tabla(
+        ['Producto', 'Cantidad', 'Precio', 'Subtotal'],
+        datos.detalle.map(linea => `
+          <tr>
+            <td>${E(linea.nombre_producto)}</td>
+            <td>${E(linea.cantidad)}</td>
+            <td>${money(linea.precio_unitario)}</td>
+            <td>${money(linea.subtotal)}</td>
+          </tr>
+        `)
+      )
+    }
+
+    <h3>Total: ${money(venta.total)}</h3>
+    <p>${E(venta.observacion)}</p>
+
+    ${
+      venta.estado === 'registrada'
+        ? boton('anular', id, 'Anular venta', 'danger')
+        : ''
+    }
+  `);
+}
+
+function centavos(valor) {
+  const [entero, decimal = ''] = String(valor).split('.');
+
+  return BigInt(entero) * 100n +
+    BigInt(decimal.padEnd(2, '0').slice(0, 2));
+}
+
+function totalCarrito() {
+  let total = 0n;
+
+  for (const [id, cantidad] of carrito) {
+    const producto = catalogo.find(p => Number(p.id) === id);
+    total += centavos(producto.precio) * BigInt(cantidad);
+  }
+
+  return `${total / 100n}.${String(total % 100n).padStart(2, '0')}`;
+}
+
+function mostrarCarrito() {
+  $('#carrito').innerHTML = tabla(
+    ['Producto', 'Cantidad', 'Acción'],
+    [...carrito].map(([id, cantidad]) => {
+      const producto = catalogo.find(p => Number(p.id) === id);
+
+      return `
+        <tr>
+          <td>${E(producto.nombre)}</td>
+          <td>${cantidad}</td>
+          <td>${boton('quitar', id, 'Quitar')}</td>
+        </tr>
+      `;
+    })
+  ) + `<h3>Total estimado: $${totalCarrito()}</h3>`;
+
+  controles();
+}
+
+async function nuevaVenta() {
+  const [clientes, productos, inventario] = await Promise.all([
+    api('/clientes'),
+    api('/productos'),
+    api('/inventario')
+  ]);
+
+  if (!clientes.clientes.length) {
+    throw Error('Primero registra un cliente.');
+  }
+
+  catalogo = productos.productos.map(producto => ({
+    ...producto,
+    existencia: Number(
+      inventario.inventario.find(
+        registro =>
+          Number(registro.producto_id) === Number(producto.id)
+      )?.existencia || 0
+    )
+  }));
+
+  carrito.clear();
+
+  abrir(`
+    <h2>Nueva venta</h2>
+
+    <form id="guardarVenta">
+      <label>
+        <span>Cliente</span>
+        <select name="cliente_id" required>
+          <option value="">Selecciona un cliente</option>
+          ${clientes.clientes.map(cliente => `
+            <option value="${E(cliente.id)}">
+              ${E(cliente.nombre)}
+            </option>
+          `).join('')}
+        </select>
+      </label>
+
+      <div class="toolbar">
+        <label>
+          <span>Producto</span>
+          <select id="productoVenta">
+            ${catalogo
+              .filter(producto => producto.existencia > 0)
+              .map(producto => `
+                <option value="${E(producto.id)}">
+                  ${E(producto.nombre)}
+                  · $${E(producto.precio)}
+                  · stock ${producto.existencia}
+                </option>
+              `).join('')}
+          </select>
+        </label>
+
+        <label>
+          <span>Cantidad</span>
+          <input id="cantidadVenta" type="number"
+                 value="1" min="1" step="1">
+        </label>
+
+        <button type="button" id="agregar">Agregar</button>
+      </div>
+
+      <div id="carrito"></div>
+
+      ${campo('observacion', 'Observación (opcional)', '', 250)}
+
+      <p class="muted">
+        El servidor confirma los precios actuales y descuenta el inventario.
+      </p>
+
+      <button class="primary">Registrar venta</button>
+    </form>
+  `);
+
+  mostrarCarrito();
+}
+
+async function guardar(ruta, metodo, datos, formularioActual) {
+  try {
+    const resultado = await api(ruta, metodo, datos);
+
+    modal.close();
+    mensaje(resultado.mensaje || 'Guardado correctamente.');
+    await cargar();
+  } catch (error) {
+    if (error.incierto) {
+      formularioActual
+        .querySelectorAll('button,input,select,textarea')
+        .forEach(elemento => {
+          elemento.disabled = true;
+
+          if (elemento.tagName === 'BUTTON') {
+            elemento.dataset.bloqueado = '1';
+          }
+        });
+
+      error.message +=
+        ' Cierra este formulario y consulta la lista antes de repetir.';
+    }
+
+    throw error;
+  }
+}
+
+/* IDIOMA Y PANTALLAS DE ACCESO */
+
+$('#idiomaSistema').addEventListener('change', e => {
+  idioma = e.target.value === 'en' ? 'en' : 'es';
+
+  try {
+    localStorage.setItem('smartmarket_idioma', idioma);
+  } catch (_) {}
+
+  traducirAcceso();
+  mensaje('');
 });
 
-// ============================================================
-// REGISTRO: CREA EL EMPRENDIMIENTO Y SU USUARIO
-// ============================================================
+$('#abrirRegistro').addEventListener('click', () => {
+  vistaFormulario('registro');
+});
 
-app.post("/registro", async (req, res) => {
-  const {
-    nombre,
-    correo,
-    password,
-    tienda,
-    categoria
-  } = req.body || {};
+$('#volverLogin').addEventListener('click', () => {
+  if (ocupado) return;
+  $('#registroForm').reset();
+  vistaFormulario('login');
+});
 
-  if (
-    typeof nombre !== "string" ||
-    typeof correo !== "string" ||
-    typeof password !== "string"
-  ) {
-    return res.status(400).json({
-      mensaje: "Debes enviar nombre, correo y contraseña"
-    });
-  }
+$('#abrirRecuperacion').addEventListener('click', () => {
+  vistaFormulario('recuperar');
+});
 
-  const nombreLimpio = nombre.trim();
-  const correoLimpio = correo.trim().toLowerCase();
+$('#volverDesdeRecuperar').addEventListener('click', () => {
+  if (ocupado) return;
+  $('#formRecuperar').reset();
+  vistaFormulario('login');
+});
 
-  if (
-    !nombreLimpio ||
-    nombreLimpio.length > 100 ||
-    correoLimpio.length > 150 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)
-  ) {
-    return res.status(400).json({
-      mensaje: "Revisa el nombre y el correo"
-    });
+$('#volverDesdeNueva').addEventListener('click', () => {
+  if (ocupado) return;
+  tokenRecuperacion = '';
+  $('#formNueva').reset();
+  vistaFormulario('login');
+});
+
+function validarClave(password, confirmacion) {
+  if (password !== confirmacion) {
+    throw Error(t('noCoinciden'));
   }
 
   if (
     password.length < 8 ||
-    Buffer.byteLength(password, "utf8") > 72
+    new TextEncoder().encode(password).length > 72
   ) {
-    return res.status(400).json({
-      mensaje:
-        "La contraseña debe tener al menos 8 caracteres y máximo 72 bytes"
-    });
-  }
-
-  if (
-    typeof tienda !== "string" ||
-    !tienda.trim() ||
-    tienda.trim().length > 150
-  ) {
-    return res.status(400).json({
-      mensaje: "Escribe el nombre de tu tienda, máximo 150 caracteres"
-    });
-  }
-
-  if (
-    typeof categoria !== "string" ||
-    !CATEGORIAS.includes(categoria)
-  ) {
-    return res.status(400).json({
-      mensaje: "Selecciona una categoría válida para tu negocio"
-    });
-  }
-
-  let db;
-
-  try {
-    const passwordHash = await bcrypt.hash(password, 12);
-
-    db = await pool.connect();
-    await db.query("BEGIN");
-
-    const negocio = await db.query(
-      `INSERT INTO emprendimientos (nombre, categoria)
-       VALUES ($1, $2)
-       RETURNING id`,
-      [tienda.trim(), categoria]
-    );
-
-    // El registro público siempre crea un usuario normal.
-    const resultado = await db.query(
-      `INSERT INTO usuarios (
-         nombre,
-         correo,
-         password_hash,
-         rol,
-         emprendimiento_id
-       )
-       VALUES ($1, $2, $3, 'usuario', $4)
-       RETURNING id, nombre, correo, rol, emprendimiento_id`,
-      [
-        nombreLimpio,
-        correoLimpio,
-        passwordHash,
-        negocio.rows[0].id
-      ]
-    );
-
-    await db.query("COMMIT");
-
-    return res.status(201).json({
-      mensaje: "Usuario registrado correctamente",
-      usuario: resultado.rows[0]
-    });
-  } catch (error) {
-    if (db) {
-      await db.query("ROLLBACK").catch(() => {});
-    }
-
-    if (error.code === "23505") {
-      return res.status(409).json({
-        mensaje: "Ese correo ya está registrado"
-      });
-    }
-
-    console.error("Error al registrar usuario:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo registrar el usuario"
-    });
-  } finally {
-    if (db) db.release();
-  }
-});
-
-// ============================================================
-// INICIO DE SESIÓN
-// ============================================================
-
-app.post("/login", async (req, res) => {
-  const { correo, password } = req.body || {};
-
-  if (
-    typeof correo !== "string" ||
-    typeof password !== "string" ||
-    !correo.trim() ||
-    !password ||
-    correo.trim().length > 150 ||
-    Buffer.byteLength(password, "utf8") > 72
-  ) {
-    return res.status(400).json({
-      mensaje: "Debes enviar un correo y una contraseña válidos"
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         u.id,
-         u.nombre,
-         u.correo,
-         u.password_hash,
-         u.rol,
-         u.activo,
-         u.emprendimiento_id,
-         e.nombre AS tienda,
-         e.categoria
-       FROM usuarios u
-       LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
-       WHERE u.correo = $1`,
-      [correo.trim().toLowerCase()]
-    );
-
-    const usuario = resultado.rows[0];
-
-    if (!usuario) {
-      return res.status(401).json({
-        mensaje: "Correo o contraseña incorrectos"
-      });
-    }
-
-    const passwordCorrecto = await bcrypt.compare(
-      password,
-      usuario.password_hash
-    );
-
-    if (!passwordCorrecto || !usuario.activo) {
-      return res.status(401).json({
-        mensaje: "Correo o contraseña incorrectos"
-      });
-    }
-
-    const token = jwt.sign({}, JWT_SECRET, {
-      algorithm: "HS256",
-      subject: String(usuario.id),
-      expiresIn: "1h"
-    });
-
-    return res.json({
-      mensaje: "Inicio de sesión exitoso",
-      token,
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        correo: usuario.correo,
-        rol: usuario.rol,
-        emprendimiento_id: usuario.emprendimiento_id,
-        tienda: usuario.tienda,
-        categoria: usuario.categoria
-      }
-    });
-  } catch (error) {
-    console.error("Error al verificar credenciales:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo verificar el inicio de sesión"
-    });
-  }
-});
-
-// ============================================================
-// VERIFICACIÓN DE ACCESO Y SEPARACIÓN POR EMPRENDIMIENTO
-// ============================================================
-
-async function verificarToken(req, res, next) {
-  const autorizacion = req.get("Authorization") || "";
-  const coincidencia = autorizacion.match(/^Bearer\s+(\S+)$/i);
-
-  if (!coincidencia) {
-    return res.status(401).json({
-      mensaje: "Debes enviar un token de acceso"
-    });
-  }
-
-  let datos;
-
-  try {
-    datos = jwt.verify(coincidencia[1], JWT_SECRET, {
-      algorithms: ["HS256"]
-    });
-
-    if (
-      typeof datos !== "object" ||
-      datos === null ||
-      typeof datos.sub !== "string" ||
-      !/^[1-9]\d*$/.test(datos.sub) ||
-      !Number.isSafeInteger(datos.exp)
-    ) {
-      throw new Error("Token inválido");
-    }
-  } catch (error) {
-    return res.status(401).json({
-      mensaje: "Token inválido o vencido"
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         u.id,
-         u.nombre,
-         u.correo,
-         u.rol,
-         u.emprendimiento_id,
-         e.nombre AS tienda,
-         e.categoria
-       FROM usuarios u
-       LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
-       WHERE u.id::text = $1
-         AND u.activo = TRUE`,
-      [datos.sub]
-    );
-
-    if (!resultado.rows[0]) {
-      return res.status(401).json({
-        mensaje: "Usuario no disponible"
-      });
-    }
-
-    req.usuario = resultado.rows[0];
-
-    const administrador = req.usuario.rol === "administrador";
-
-    if (!administrador && !req.usuario.emprendimiento_id) {
-      return res.status(403).json({
-        mensaje: "Tu cuenta no tiene un emprendimiento asignado"
-      });
-    }
-
-    // Usuarios normales: su emprendimiento procede de la sesión.
-    // Administrador: null permite la consulta general.
-    req.negocioId = administrador
-      ? null
-      : req.usuario.emprendimiento_id;
-
-    // Solo el administrador puede filtrar consultas por otra tienda.
-    const filtro = req.get("X-Emprendimiento");
-
-    if (administrador && filtro) {
-      if (
-        !/^[1-9]\d*$/.test(filtro) ||
-        Number(filtro) > 2147483647
-      ) {
-        return res.status(400).json({
-          mensaje: "Emprendimiento inválido"
-        });
-      }
-
-      req.negocioId = Number(filtro);
-    }
-
-    // El administrador general supervisa; las operaciones se
-    // registran con una cuenta normal del emprendimiento.
-    if (administrador && req.method !== "GET") {
-      return res.status(403).json({
-        mensaje:
-          "El administrador general tiene acceso de consulta. " +
-          "Usa una cuenta del emprendimiento para registrar operaciones."
-      });
-    }
-
-    return next();
-  } catch (error) {
-    console.error("Error al verificar usuario:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo comprobar el acceso"
-    });
+    throw Error(t('invalida'));
   }
 }
 
-// ============================================================
-// PERFIL Y EMPRENDIMIENTOS
-// ============================================================
+/* REGISTRO DE USUARIOS */
 
-app.get("/perfil", verificarToken, (req, res) => {
-  return res.json({
-    mensaje: "Acceso autorizado",
-    usuario: req.usuario
+$('#registroForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (ocupado) return;
+
+  const formularioActual = e.currentTarget;
+  const datos = Object.fromEntries(new FormData(formularioActual));
+
+  datos.nombre = datos.nombre.trim();
+  datos.correo = datos.correo.trim().toLowerCase();
+
+  if (!datos.nombre) {
+    mensaje(t('nombreObligatorio'), true);
+    return;
+  }
+
+  try {
+    validarClave(datos.password, datos.confirmacion);
+  } catch (error) {
+    mensaje(error.message, true);
+    return;
+  }
+
+  tarea(async () => {
+    mensaje('');
+
+    try {
+      await api('/registro', 'POST', {
+        nombre: datos.nombre,
+        correo: datos.correo,
+        password: datos.password,
+        tienda: datos.tienda.trim(),
+        categoria: datos.categoria
+      });
+    } catch (error) {
+      if (error.incierto) {
+        error.message += t('revisarRegistro');
+      }
+
+      throw error;
+    }
+
+    formularioActual.reset();
+    $('#loginForm').reset();
+    $('#loginForm').elements.correo.value = datos.correo;
+
+    vistaAcceso = 'login';
+    acceso();
+
+    mensaje(t('cuentaCreada'));
+    $('#loginForm').elements.password.focus();
   });
 });
 
-app.get("/emprendimientos", verificarToken, async (req, res) => {
-  if (req.usuario.rol !== "administrador") {
-    return res.status(403).json({
-      mensaje: "Acceso exclusivo del administrador"
-    });
-  }
+/* INICIO DE SESIÓN */
 
-  try {
-    const resultado = await pool.query(
-      `SELECT id, nombre, categoria
-       FROM emprendimientos
-       ORDER BY nombre, id`
-    );
+$('#loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (ocupado) return;
 
-    return res.json({
-      emprendimientos: resultado.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar emprendimientos:", error.message);
+  const datos = Object.fromEntries(new FormData(e.currentTarget));
+  datos.correo = datos.correo.trim().toLowerCase();
 
-    return res.status(500).json({
-      mensaje: "No se pudieron consultar los emprendimientos"
-    });
-  }
-});
+  tarea(async () => {
+    mensaje('');
 
-// ============================================================
-// PRODUCTOS
-// ============================================================
+    const resultado = await api('/login', 'POST', datos);
 
-app.get("/productos", verificarToken, async (req, res) => {
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         p.id,
-         p.nombre,
-         p.descripcion,
-         p.precio,
-         p.emprendimiento_id,
-         e.nombre AS tienda,
-         e.categoria
-       FROM productos p
-       JOIN emprendimientos e ON e.id = p.emprendimiento_id
-       WHERE p.activo = TRUE
-         AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
-       ORDER BY p.nombre, p.id`,
-      [req.negocioId]
-    );
-
-    return res.json({
-      productos: resultado.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar productos:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudieron consultar los productos"
-    });
-  }
-});
-
-app.post("/productos", verificarToken, async (req, res) => {
-  const { nombre, descripcion, precio } = req.body || {};
-
-  if (
-    typeof nombre !== "string" ||
-    !nombre.trim() ||
-    nombre.trim().length > 150
-  ) {
-    return res.status(400).json({
-      mensaje: "El nombre es obligatorio y admite hasta 150 caracteres"
-    });
-  }
-
-  if (
-    descripcion !== undefined &&
-    typeof descripcion !== "string"
-  ) {
-    return res.status(400).json({
-      mensaje: "La descripción debe ser un texto"
-    });
-  }
-
-  if (
-    typeof precio !== "string" &&
-    typeof precio !== "number"
-  ) {
-    return res.status(400).json({
-      mensaje: "Debes ingresar un precio válido"
-    });
-  }
-
-  const precioTexto = String(precio).trim().replace(",", ".");
-
-  if (!/^\d{1,10}(\.\d{1,2})?$/.test(precioTexto)) {
-    return res.status(400).json({
-      mensaje:
-        "El precio debe ser positivo o cero y tener máximo 2 decimales"
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `INSERT INTO productos (
-         nombre, descripcion, precio, emprendimiento_id
-       )
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, nombre, descripcion, precio`,
-      [
-        nombre.trim(),
-        descripcion?.trim() || null,
-        precioTexto,
-        req.negocioId
-      ]
-    );
-
-    return res.status(201).json({
-      mensaje: "Producto registrado correctamente",
-      producto: resultado.rows[0]
-    });
-  } catch (error) {
-    console.error("Error al registrar producto:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo registrar el producto"
-    });
-  }
-});
-
-app.put("/productos/:id", verificarToken, async (req, res) => {
-  const { id } = req.params;
-  const { nombre, descripcion, precio } = req.body || {};
-
-  if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) {
-    return res.status(400).json({
-      mensaje: "El identificador del producto no es válido"
-    });
-  }
-
-  if (
-    typeof nombre !== "string" ||
-    !nombre.trim() ||
-    nombre.trim().length > 150
-  ) {
-    return res.status(400).json({
-      mensaje: "El nombre es obligatorio y admite hasta 150 caracteres"
-    });
-  }
-
-  if (
-    descripcion !== undefined &&
-    typeof descripcion !== "string"
-  ) {
-    return res.status(400).json({
-      mensaje: "La descripción debe ser un texto"
-    });
-  }
-
-  if (
-    typeof precio !== "string" &&
-    typeof precio !== "number"
-  ) {
-    return res.status(400).json({
-      mensaje: "Debes ingresar un precio válido"
-    });
-  }
-
-  const precioTexto = String(precio).trim().replace(",", ".");
-
-  if (!/^\d{1,10}(\.\d{1,2})?$/.test(precioTexto)) {
-    return res.status(400).json({
-      mensaje:
-        "El precio debe ser positivo o cero y tener máximo 2 decimales"
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `UPDATE productos
-       SET nombre = $1,
-           descripcion = $2,
-           precio = $3
-       WHERE id = $4
-         AND activo = TRUE
-         AND emprendimiento_id = $5
-       RETURNING id, nombre, descripcion, precio`,
-      [
-        nombre.trim(),
-        descripcion?.trim() || null,
-        precioTexto,
-        id,
-        req.negocioId
-      ]
-    );
-
-    if (!resultado.rows[0]) {
-      return res.status(404).json({
-        mensaje: "El producto no existe o está inactivo"
-      });
+    if (
+      typeof resultado.token !== 'string' ||
+      !resultado.token
+    ) {
+      throw Error(t('tokenInvalido'));
     }
 
-    return res.json({
-      mensaje: "Producto actualizado correctamente",
-      producto: resultado.rows[0]
-    });
-  } catch (error) {
-    console.error("Error al actualizar producto:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo actualizar el producto"
-    });
-  }
-});
-
-app.patch(
-  "/productos/:id/desactivar",
-  verificarToken,
-  async (req, res) => {
-    const { id } = req.params;
-
-    if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) {
-      return res.status(400).json({
-        mensaje: "El identificador del producto no es válido"
-      });
-    }
+    token = resultado.token;
 
     try {
-      const resultado = await pool.query(
-        `UPDATE productos
-         SET activo = FALSE
-         WHERE id = $1
-           AND emprendimiento_id = $2
-         RETURNING id, nombre, activo`,
-        [id, req.negocioId]
-      );
+      const perfil = await api('/perfil');
 
-      if (!resultado.rows[0]) {
-        return res.status(404).json({
-          mensaje: "El producto no existe"
-        });
+      if (
+        !perfil.usuario ||
+        typeof perfil.usuario.nombre !== 'string'
+      ) {
+        throw Error(t('perfilInvalido'));
       }
 
-      return res.json({
-        mensaje: "Producto desactivado correctamente",
-        producto: resultado.rows[0]
-      });
+      usuario = perfil.usuario;
+      negocioSeleccionado = '';
+
+      negocios = esAdmin()
+        ? (await api('/emprendimientos')).emprendimientos
+        : [];
     } catch (error) {
-      console.error("Error al desactivar producto:", error.message);
-
-      return res.status(500).json({
-        mensaje: "No se pudo desactivar el producto"
-      });
+      token = '';
+      usuario = null;
+      vistaAcceso = 'login';
+      acceso();
+      throw error;
     }
+
+    $('#loginForm').elements.password.value = '';
+
+    acceso();
+    await navegar('resumen');
+  });
+});
+
+/* RECUPERACIÓN DE CONTRASEÑA */
+
+$('#formRecuperar').addEventListener('submit', e => {
+  e.preventDefault();
+  if (ocupado) return;
+
+  const formularioActual = e.currentTarget;
+  const correo = formularioActual.elements.correo.value
+    .trim()
+    .toLowerCase();
+
+  tarea(async () => {
+    mensaje('');
+    await api('/recuperar-password', 'POST', { correo });
+
+    formularioActual.reset();
+    mensaje(t('enviado'));
+  });
+});
+
+$('#formNueva').addEventListener('submit', e => {
+  e.preventDefault();
+  if (ocupado) return;
+
+  const formularioActual = e.currentTarget;
+  const password = formularioActual.elements.password.value;
+  const confirmacion = formularioActual.elements.confirmacion.value;
+
+  if (!tokenRecuperacion) {
+    mensaje(t('enlaceInvalido'), true);
+    return;
   }
-);
 
-// ============================================================
-// INVENTARIO
-// ============================================================
-
-app.get("/inventario", verificarToken, async (req, res) => {
   try {
-    const resultado = await pool.query(
-      `SELECT
-         p.id AS producto_id,
-         p.nombre,
-         p.emprendimiento_id,
-         e.nombre AS tienda,
-         COALESCE(i.existencia, 0) AS existencia
-       FROM productos p
-       JOIN emprendimientos e ON e.id = p.emprendimiento_id
-       LEFT JOIN inventario i ON i.producto_id = p.id
-       WHERE p.activo = TRUE
-         AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
-       ORDER BY p.nombre, p.id`,
-      [req.negocioId]
+    validarClave(password, confirmacion);
+  } catch (error) {
+    mensaje(error.message, true);
+    return;
+  }
+
+  tarea(async () => {
+    mensaje('');
+
+    await api('/restablecer-password', 'POST', {
+      token: tokenRecuperacion,
+      password
+    });
+
+    tokenRecuperacion = '';
+    formularioActual.reset();
+
+    vistaAcceso = 'login';
+    acceso();
+
+    mensaje(t('actualizado'));
+    $('#loginForm').elements.password.focus();
+  });
+});
+
+/* SELECCIÓN DE EMPRENDIMIENTO DEL ADMINISTRADOR */
+
+$('#sesion').addEventListener('change', e => {
+  if (e.target.id !== 'seleccionNegocio' || ocupado) return;
+
+  negocioSeleccionado = e.target.value;
+  $('#eliminarNegocio').dataset.bloqueado = negocioSeleccionado ? '0' : '1';
+
+  tarea(async () => {
+    if (modal.open) modal.close();
+
+    registros = [];
+    catalogo = [];
+    carrito.clear();
+    mensaje('');
+
+    await navegar(pagina);
+  });
+});
+
+$('#sesion').addEventListener('click', e => {
+  if (!e.target.closest('#eliminarNegocio') || ocupado || !esAdmin()) return;
+
+  const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
+  if (!negocio || !window.confirm(
+    `¿Eliminar «${negocio.nombre}»? Sus cuentas perderán el acceso y se conservará su historial.`
+  )) return;
+
+  tarea(async () => {
+    mensaje('');
+    const resultado = await api(
+      '/emprendimientos/' + encodeURIComponent(negocio.id),
+      'DELETE'
     );
 
-    return res.json({
-      inventario: resultado.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar inventario:", error.message);
+    negocios = negocios.filter(n => n.id !== negocio.id);
+    negocioSeleccionado = '';
+    registros = [];
+    catalogo = [];
+    carrito.clear();
+    if (modal.open) modal.close();
+    acceso();
+    controles();
 
-    return res.status(500).json({
-      mensaje: "No se pudo consultar el inventario"
-    });
+    await navegar(pagina);
+    mensaje(resultado.mensaje);
+  });
+});
+
+/* NAVEGACIÓN Y CIERRE DE SESIÓN */
+
+$('#nav').addEventListener('click', e => {
+  const botonActual = e.target.closest('[data-pagina]');
+  if (!botonActual) return;
+
+  tarea(async () => {
+    mensaje('');
+    await navegar(botonActual.dataset.pagina);
+  });
+});
+
+$('#sesion').addEventListener('click', e => {
+  if (e.target.id !== 'salir' || ocupado) return;
+
+  token = '';
+  usuario = null;
+  negocios = [];
+  negocioSeleccionado = '';
+  registros = [];
+  catalogo = [];
+  carrito.clear();
+
+  if (modal.open) modal.close();
+
+  $('#contenido').innerHTML = '';
+  $('#nav').innerHTML = '';
+
+  vistaAcceso = 'login';
+  acceso();
+  mensaje(t('sesionCerrada'));
+});
+
+modal.addEventListener('cancel', e => {
+  if (ocupado) e.preventDefault();
+});
+
+/* BUSCADOR LOCAL */
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'buscarLocal') {
+    dibujar();
   }
 });
 
-app.post(
-  "/inventario/movimientos",
-  verificarToken,
-  async (req, res) => {
-    const {
-      producto_id,
-      tipo,
-      cantidad,
-      motivo
-    } = req.body || {};
+/* BOTONES DEL PANEL */
 
-    if (
-      !Number.isInteger(producto_id) ||
-      producto_id < 1 ||
-      producto_id > 2147483647
-    ) {
-      return res.status(400).json({
-        mensaje: "Selecciona un producto válido"
-      });
-    }
+document.addEventListener('click', e => {
+  const botonActual = e.target.closest('button');
+  if (!botonActual || ocupado) return;
 
-    if (tipo !== "entrada" && tipo !== "salida") {
-      return res.status(400).json({
-        mensaje: "El tipo debe ser entrada o salida"
-      });
-    }
+  if (botonActual.id === 'cerrarModal') {
+    modal.close();
+    return;
+  }
 
-    if (
-      !Number.isInteger(cantidad) ||
-      cantidad < 1 ||
-      cantidad > 2147483647
-    ) {
-      return res.status(400).json({
-        mensaje: "La cantidad debe ser un número entero mayor que cero"
-      });
-    }
+  if (botonActual.id === 'actualizar') {
+    return tarea(cargar);
+  }
 
-    if (
-      typeof motivo !== "string" ||
-      !motivo.trim() ||
-      motivo.trim().length > 250
-    ) {
-      return res.status(400).json({
-        mensaje: "El motivo es obligatorio y admite hasta 250 caracteres"
-      });
-    }
+  if (botonActual.id === 'limpiar') {
+    $('#filtros').reset();
+    return tarea(cargar);
+  }
 
-    let cliente;
-
-    try {
-      cliente = await pool.connect();
-      await cliente.query("BEGIN");
-
-      const producto = await cliente.query(
-        `SELECT id
-         FROM productos
-         WHERE id = $1
-           AND activo = TRUE
-           AND emprendimiento_id = $2
-         FOR UPDATE`,
-        [producto_id, req.negocioId]
-      );
-
-      if (!producto.rows[0]) {
-        await cliente.query("ROLLBACK");
-
-        return res.status(404).json({
-          mensaje: "El producto no existe o está inactivo"
-        });
+  if (botonActual.id === 'nuevo') {
+    return tarea(async () => {
+      if (pagina === 'ventas') {
+        await nuevaVenta();
+      } else {
+        formulario();
       }
-
-      await cliente.query(
-        `INSERT INTO inventario (producto_id)
-         VALUES ($1)
-         ON CONFLICT (producto_id) DO NOTHING`,
-        [producto_id]
-      );
-
-      const inventario = await cliente.query(
-        `SELECT existencia
-         FROM inventario
-         WHERE producto_id = $1
-         FOR UPDATE`,
-        [producto_id]
-      );
-
-      const anterior = inventario.rows[0].existencia;
-
-      const nueva = tipo === "entrada"
-        ? anterior + cantidad
-        : anterior - cantidad;
-
-      if (nueva < 0) {
-        await cliente.query("ROLLBACK");
-
-        return res.status(409).json({
-          mensaje: "No hay existencias suficientes para esa salida",
-          existencia: anterior
-        });
-      }
-
-      if (nueva > 2147483647) {
-        await cliente.query("ROLLBACK");
-
-        return res.status(400).json({
-          mensaje: "La entrada supera el límite de existencias permitido"
-        });
-      }
-
-      await cliente.query(
-        `UPDATE inventario
-         SET existencia = $1,
-             fecha_actualizacion = NOW()
-         WHERE producto_id = $2`,
-        [nueva, producto_id]
-      );
-
-      const movimiento = await cliente.query(
-        `INSERT INTO movimientos_inventario (
-           producto_id,
-           usuario_id,
-           tipo,
-           cantidad,
-           motivo,
-           existencia_anterior,
-           existencia_nueva
-         )
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING *`,
-        [
-          producto_id,
-          req.usuario.id,
-          tipo,
-          cantidad,
-          motivo.trim(),
-          anterior,
-          nueva
-        ]
-      );
-
-      await cliente.query("COMMIT");
-
-      return res.status(201).json({
-        mensaje: "Movimiento registrado correctamente",
-        movimiento: movimiento.rows[0]
-      });
-    } catch (error) {
-      if (cliente) {
-        try {
-          await cliente.query("ROLLBACK");
-        } catch (errorRollback) {
-          console.error(
-            "Error al revertir movimiento:",
-            errorRollback.message
-          );
-        }
-      }
-
-      console.error("Error al registrar movimiento:", error.message);
-
-      return res.status(500).json({
-        mensaje: "No se pudo registrar el movimiento"
-      });
-    } finally {
-      if (cliente) cliente.release();
-    }
-  }
-);
-
-// ============================================================
-// CLIENTES
-// ============================================================
-
-function validarCliente(body) {
-  const limites = {
-    nombre: 150,
-    identificacion: 20,
-    telefono: 30,
-    correo: 150,
-    direccion: 250
-  };
-
-  const datos = {};
-
-  for (const [campo, limite] of Object.entries(limites)) {
-    const valor = body?.[campo];
-
-    if (
-      valor !== undefined &&
-      valor !== null &&
-      typeof valor !== "string"
-    ) {
-      return {
-        error: `El campo ${campo} debe ser un texto`
-      };
-    }
-
-    const texto = (valor ?? "").trim();
-
-    if (texto.length > limite) {
-      return {
-        error: `${campo}: máximo ${limite} caracteres`
-      };
-    }
-
-    datos[campo] = texto || null;
-  }
-
-  if (!datos.nombre) {
-    return {
-      error: "El nombre del cliente es obligatorio"
-    };
-  }
-
-  if (datos.correo) {
-    datos.correo = datos.correo.toLowerCase();
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
-      return {
-        error: "El correo no es válido"
-      };
-    }
-  }
-
-  return { datos };
-}
-
-function idClienteValido(id) {
-  return (
-    /^[1-9]\d*$/.test(id) &&
-    Number(id) <= 2147483647
-  );
-}
-
-app.get("/clientes", verificarToken, async (req, res) => {
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         c.id,
-         c.nombre,
-         c.identificacion,
-         c.telefono,
-         c.correo,
-         c.direccion,
-         c.emprendimiento_id,
-         e.nombre AS tienda,
-         e.categoria
-       FROM clientes c
-       JOIN emprendimientos e ON e.id = c.emprendimiento_id
-       WHERE c.activo = TRUE
-         AND ($1::integer IS NULL OR c.emprendimiento_id = $1)
-       ORDER BY c.nombre, c.id`,
-      [req.negocioId]
-    );
-
-    return res.json({
-      clientes: resultado.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar clientes:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudieron consultar los clientes"
-    });
-  }
-});
-
-app.post("/clientes", verificarToken, async (req, res) => {
-  const validacion = validarCliente(req.body);
-
-  if (validacion.error) {
-    return res.status(400).json({
-      mensaje: validacion.error
     });
   }
 
-  const d = validacion.datos;
+  if (botonActual.id === 'agregar') {
+    const id = Number($('#productoVenta').value);
+    const cantidad = Number($('#cantidadVenta').value);
+    const producto = catalogo.find(p => Number(p.id) === id);
 
-  try {
-    const resultado = await pool.query(
-      `INSERT INTO clientes (
-         nombre,
-         identificacion,
-         telefono,
-         correo,
-         direccion,
-         emprendimiento_id
-       )
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, nombre, identificacion, telefono, correo, direccion`,
-      [
-        d.nombre,
-        d.identificacion,
-        d.telefono,
-        d.correo,
-        d.direccion,
-        req.negocioId
-      ]
-    );
-
-    return res.status(201).json({
-      mensaje: "Cliente registrado correctamente",
-      cliente: resultado.rows[0]
-    });
-  } catch (error) {
-    console.error("Error al registrar cliente:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo registrar el cliente"
-    });
-  }
-});
-
-app.put("/clientes/:id", verificarToken, async (req, res) => {
-  if (!idClienteValido(req.params.id)) {
-    return res.status(400).json({
-      mensaje: "Identificador de cliente inválido"
-    });
-  }
-
-  const validacion = validarCliente(req.body);
-
-  if (validacion.error) {
-    return res.status(400).json({
-      mensaje: validacion.error
-    });
-  }
-
-  const d = validacion.datos;
-
-  try {
-    const resultado = await pool.query(
-      `UPDATE clientes
-       SET nombre = $1,
-           identificacion = $2,
-           telefono = $3,
-           correo = $4,
-           direccion = $5
-       WHERE id = $6
-         AND activo = TRUE
-         AND emprendimiento_id = $7
-       RETURNING id, nombre, identificacion, telefono, correo, direccion`,
-      [
-        d.nombre,
-        d.identificacion,
-        d.telefono,
-        d.correo,
-        d.direccion,
-        req.params.id,
-        req.negocioId
-      ]
-    );
-
-    if (!resultado.rows[0]) {
-      return res.status(404).json({
-        mensaje: "El cliente no existe o está inactivo"
-      });
-    }
-
-    return res.json({
-      mensaje: "Cliente actualizado correctamente",
-      cliente: resultado.rows[0]
-    });
-  } catch (error) {
-    console.error("Error al actualizar cliente:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo actualizar el cliente"
-    });
-  }
-});
-
-app.patch(
-  "/clientes/:id/desactivar",
-  verificarToken,
-  async (req, res) => {
-    if (!idClienteValido(req.params.id)) {
-      return res.status(400).json({
-        mensaje: "Identificador de cliente inválido"
-      });
-    }
-
-    try {
-      const resultado = await pool.query(
-        `UPDATE clientes
-         SET activo = FALSE
-         WHERE id = $1
-           AND emprendimiento_id = $2
-         RETURNING id, nombre, activo`,
-        [req.params.id, req.negocioId]
-      );
-
-      if (!resultado.rows[0]) {
-        return res.status(404).json({
-          mensaje: "El cliente no existe"
-        });
-      }
-
-      return res.json({
-        mensaje: "Cliente desactivado correctamente",
-        cliente: resultado.rows[0]
-      });
-    } catch (error) {
-      console.error("Error al desactivar cliente:", error.message);
-
-      return res.status(500).json({
-        mensaje: "No se pudo desactivar el cliente"
-      });
-    }
-  }
-);
-
-// ============================================================
-// VALIDACIONES PARA VENTAS Y FILTROS
-// ============================================================
-
-function enteroVenta(valor) {
-  return (
-    Number.isInteger(valor) &&
-    valor > 0 &&
-    valor <= 2147483647
-  );
-}
-
-function filtrosConsulta(query) {
-  const desde = query.desde || "";
-  const hasta = query.hasta || "";
-  const busqueda = query.busqueda || "";
-
-  if (
-    [desde, hasta, busqueda].some(
-      valor => typeof valor !== "string"
-    ) ||
-    busqueda.length > 150
-  ) {
-    throw new Error("Revisa los filtros");
-  }
-
-  for (const fecha of [desde, hasta]) {
-    if (
-      fecha &&
-      (
-        !/^\d{4}-\d{2}-\d{2}$/.test(fecha) ||
-        !Number.isFinite(Date.parse(fecha + "T00:00:00Z")) ||
-        new Date(fecha + "T00:00:00Z")
-          .toISOString()
-          .slice(0, 10) !== fecha
-      )
-    ) {
-      throw new Error(
-        "Usa fechas válidas con formato AAAA-MM-DD"
-      );
-    }
-  }
-
-  if (desde && hasta && desde > hasta) {
-    throw new Error(
-      "La fecha inicial debe ser anterior a la final"
-    );
-  }
-
-  return {
-    desde: desde || null,
-    hasta: hasta || null,
-    busqueda: busqueda.trim()
-  };
-}
-
-// ============================================================
-// CONSULTAR VENTAS
-// ============================================================
-
-app.get("/ventas", verificarToken, async (req, res) => {
-  let filtros;
-
-  try {
-    filtros = filtrosConsulta(req.query);
-  } catch (error) {
-    return res.status(400).json({
-      mensaje: error.message
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         v.id,
-         v.cliente_id,
-         c.nombre AS cliente_nombre,
-         v.total,
-         v.estado,
-         v.observacion,
-         v.fecha_creacion,
-         v.emprendimiento_id,
-         e.nombre AS tienda,
-         u.nombre AS usuario_nombre
-       FROM ventas v
-       JOIN clientes c ON c.id = v.cliente_id
-       JOIN emprendimientos e ON e.id = v.emprendimiento_id
-       JOIN usuarios u ON u.id = v.usuario_id
-       WHERE (
-         $4::integer IS NULL
-         OR v.emprendimiento_id = $4
-       )
-       AND (
-         $1::date IS NULL
-         OR (v.fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
-            >= $1::date
-       )
-       AND (
-         $2::date IS NULL
-         OR (v.fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
-            <= $2::date
-       )
-       AND (
-         $3 = ''
-         OR POSITION(LOWER($3) IN LOWER(c.nombre)) > 0
-         OR v.id::text = $3
-       )
-       ORDER BY v.fecha_creacion DESC, v.id DESC
-       LIMIT 200`,
-      [
-        filtros.desde,
-        filtros.hasta,
-        filtros.busqueda,
-        req.negocioId
-      ]
-    );
-
-    return res.json({
-      ventas: resultado.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar ventas:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudieron consultar las ventas"
-    });
-  }
-});
-
-app.get("/ventas/:id", verificarToken, async (req, res) => {
-  if (
-    !/^[1-9]\d*$/.test(req.params.id) ||
-    Number(req.params.id) > 2147483647
-  ) {
-    return res.status(400).json({
-      mensaje: "Identificador de venta inválido"
-    });
-  }
-
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         v.*,
-         c.nombre AS cliente_nombre,
-         e.nombre AS tienda,
-         u.nombre AS usuario_nombre
-       FROM ventas v
-       JOIN clientes c ON c.id = v.cliente_id
-       JOIN emprendimientos e ON e.id = v.emprendimiento_id
-       JOIN usuarios u ON u.id = v.usuario_id
-       WHERE v.id = $1
-         AND ($2::integer IS NULL OR v.emprendimiento_id = $2)`,
-      [req.params.id, req.negocioId]
-    );
-
-    if (!resultado.rows[0]) {
-      return res.status(404).json({
-        mensaje: "La venta no existe"
-      });
-    }
-
-    const detalle = await pool.query(
-      `SELECT
-         producto_id,
-         nombre_producto,
-         cantidad,
-         precio_unitario,
-         subtotal
-       FROM detalle_ventas
-       WHERE venta_id = $1
-       ORDER BY id`,
-      [req.params.id]
-    );
-
-    return res.json({
-      venta: resultado.rows[0],
-      detalle: detalle.rows
-    });
-  } catch (error) {
-    console.error("Error al consultar venta:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo consultar la venta"
-    });
-  }
-});
-
-// ============================================================
-// REGISTRAR VENTA
-// ============================================================
-
-app.post("/ventas", verificarToken, async (req, res) => {
-  const {
-    cliente_id,
-    productos,
-    observacion
-  } = req.body || {};
-
-  if (!enteroVenta(cliente_id)) {
-    return res.status(400).json({
-      mensaje: "Selecciona un cliente válido"
-    });
-  }
-
-  if (
-    !Array.isArray(productos) ||
-    productos.length < 1 ||
-    productos.length > 100
-  ) {
-    return res.status(400).json({
-      mensaje: "Agrega entre 1 y 100 productos"
-    });
-  }
-
-  if (
-    observacion != null &&
-    (
-      typeof observacion !== "string" ||
-      observacion.trim().length > 250
-    )
-  ) {
-    return res.status(400).json({
-      mensaje: "La observación admite hasta 250 caracteres"
-    });
-  }
-
-  const ids = new Set();
-
-  for (const producto of productos) {
     if (
       !producto ||
-      !enteroVenta(producto.producto_id) ||
-      !enteroVenta(producto.cantidad) ||
-      ids.has(producto.producto_id)
+      !Number.isSafeInteger(cantidad) ||
+      cantidad < 1 ||
+      cantidad + (carrito.get(id) || 0) > producto.existencia
     ) {
-      return res.status(400).json({
-        mensaje:
-          "Revisa los productos y sus cantidades; no repitas productos"
-      });
+      mensaje('Cantidad inválida o existencias insuficientes.', true);
+      return;
     }
 
-    ids.add(producto.producto_id);
+    carrito.set(id, cantidad + (carrito.get(id) || 0));
+    mostrarCarrito();
+    return;
   }
 
-  const orden = [...productos].sort(
-    (a, b) => a.producto_id - b.producto_id
-  );
+  const accion = botonActual.dataset.accion;
+  const id = Number(botonActual.dataset.id);
 
-  let db;
+  if (!accion) return;
 
-  try {
-    db = await pool.connect();
-    await db.query("BEGIN");
+  if (accion === 'quitar') {
+    carrito.delete(id);
+    mostrarCarrito();
+    return;
+  }
 
-    const cliente = await db.query(
-      `SELECT id
-       FROM clientes
-       WHERE id = $1
-         AND activo = TRUE
-         AND emprendimiento_id = $2
-       FOR SHARE`,
-      [cliente_id, req.negocioId]
+  if (accion === 'editar') {
+    const registro = registros.find(r => Number(r.id) === id);
+    if (registro) formulario(registro);
+    return;
+  }
+
+  if (accion === 'movimiento') {
+    const registro = registros.find(
+      r => Number(r.producto_id) === id
     );
 
-    if (!cliente.rows[0]) {
-      await db.query("ROLLBACK");
+    if (registro) movimiento(registro);
+    return;
+  }
 
-      return res.status(409).json({
-        mensaje: "El cliente ya no está disponible"
-      });
-    }
+  if (accion === 'detalle') {
+    return tarea(() => detalle(id));
+  }
 
-    const lineas = [];
-    let total = 0n;
-
-    for (const item of orden) {
-      const producto = await db.query(
-        `SELECT id, nombre, precio
-         FROM productos
-         WHERE id = $1
-           AND activo = TRUE
-           AND emprendimiento_id = $2
-         FOR UPDATE`,
-        [item.producto_id, req.negocioId]
+  if (
+    accion === 'desactivar' &&
+    confirm('¿Desactivar este registro?')
+  ) {
+    return tarea(async () => {
+      const resultado = await api(
+        '/' + pagina + '/' + id + '/desactivar',
+        'PATCH'
       );
 
-      if (!producto.rows[0]) {
-        await db.query("ROLLBACK");
-
-        return res.status(409).json({
-          mensaje: "Uno de los productos ya no está disponible"
-        });
-      }
-
-      await db.query(
-        `INSERT INTO inventario (producto_id)
-         VALUES ($1)
-         ON CONFLICT (producto_id) DO NOTHING`,
-        [item.producto_id]
-      );
-
-      const inventario = await db.query(
-        `SELECT existencia
-         FROM inventario
-         WHERE producto_id = $1
-         FOR UPDATE`,
-        [item.producto_id]
-      );
-
-      const anterior = inventario.rows[0].existencia;
-
-      if (anterior < item.cantidad) {
-        await db.query("ROLLBACK");
-
-        return res.status(409).json({
-          mensaje:
-            `Stock insuficiente para ${producto.rows[0].nombre}. ` +
-            `Disponible: ${anterior}`
-        });
-      }
-
-      const precio = String(producto.rows[0].precio);
-
-      if (!/^\d{1,10}\.\d{2}$/.test(precio)) {
-        throw new Error("Precio fuera del rango permitido");
-      }
-
-      const centavos = BigInt(precio.replace(".", ""));
-      const subtotal = centavos * BigInt(item.cantidad);
-
-      total += subtotal;
-
-      if (total > 99999999999999n) {
-        await db.query("ROLLBACK");
-
-        return res.status(400).json({
-          mensaje: "El total supera el límite permitido"
-        });
-      }
-
-      lineas.push({
-        ...item,
-        nombre: producto.rows[0].nombre,
-        precio,
-        subtotal,
-        anterior
-      });
-    }
-
-    const dinero = valor =>
-      `${valor / 100n}.${String(valor % 100n).padStart(2, "0")}`;
-
-    const resultadoVenta = await db.query(
-      `INSERT INTO ventas (
-         cliente_id,
-         usuario_id,
-         total,
-         observacion,
-         emprendimiento_id
-       )
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [
-        cliente_id,
-        req.usuario.id,
-        dinero(total),
-        observacion?.trim() || null,
-        req.negocioId
-      ]
-    );
-
-    const venta = resultadoVenta.rows[0];
-
-    for (const linea of lineas) {
-      await db.query(
-        `INSERT INTO detalle_ventas (
-           venta_id,
-           producto_id,
-           nombre_producto,
-           cantidad,
-           precio_unitario,
-           subtotal
-         )
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          venta.id,
-          linea.producto_id,
-          linea.nombre,
-          linea.cantidad,
-          linea.precio,
-          dinero(linea.subtotal)
-        ]
-      );
-
-      await db.query(
-        `UPDATE inventario
-         SET existencia = $1,
-             fecha_actualizacion = NOW()
-         WHERE producto_id = $2`,
-        [
-          linea.anterior - linea.cantidad,
-          linea.producto_id
-        ]
-      );
-
-      await db.query(
-        `INSERT INTO movimientos_inventario (
-           producto_id,
-           usuario_id,
-           tipo,
-           cantidad,
-           motivo,
-           existencia_anterior,
-           existencia_nueva
-         )
-         VALUES ($1, $2, 'salida', $3, $4, $5, $6)`,
-        [
-          linea.producto_id,
-          req.usuario.id,
-          linea.cantidad,
-          `Venta #${venta.id}`,
-          linea.anterior,
-          linea.anterior - linea.cantidad
-        ]
-      );
-    }
-
-    await db.query("COMMIT");
-
-    return res.status(201).json({
-      mensaje: "Venta registrada correctamente",
-      venta
+      mensaje(resultado.mensaje);
+      await cargar();
     });
-  } catch (error) {
-    if (db) {
+  }
+
+  if (
+    accion === 'anular' &&
+    confirm(
+      '¿Anular esta venta y devolver todas sus cantidades al inventario?'
+    )
+  ) {
+    return tarea(async () => {
       try {
-        await db.query("ROLLBACK");
-      } catch (errorRollback) {
-        console.error("Error al revertir venta:", errorRollback.message);
+        const resultado = await api(
+          '/ventas/' + id + '/anular',
+          'PATCH'
+        );
+
+        modal.close();
+        mensaje(resultado.mensaje);
+        await cargar();
+      } catch (error) {
+        if (error.incierto) {
+          modal.close();
+
+          mensaje(
+            error.message +
+            ' Comprueba el estado de la venta antes de repetir.',
+            true
+          );
+
+          await cargar();
+        } else {
+          throw error;
+        }
       }
-    }
-
-    console.error("Error al registrar venta:", error.message);
-
-    return res.status(500).json({
-      mensaje:
-        "No se pudo confirmar la venta. Consulta la lista antes de repetirla."
-    });
-  } finally {
-    if (db) db.release();
-  }
-});
-
-// ============================================================
-// RESUMEN
-// ============================================================
-
-app.get("/resumen", verificarToken, async (req, res) => {
-  try {
-    const resultado = await pool.query(
-      `SELECT
-         (
-           SELECT COUNT(*)::int
-           FROM ventas
-           WHERE estado = 'registrada'
-             AND ($1::integer IS NULL OR emprendimiento_id = $1)
-             AND (fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
-               = (NOW() AT TIME ZONE 'America/Guayaquil')::date
-         ) AS ventas_hoy,
-
-         (
-           SELECT COALESCE(SUM(total), 0)::numeric(16, 2)
-           FROM ventas
-           WHERE estado = 'registrada'
-             AND ($1::integer IS NULL OR emprendimiento_id = $1)
-             AND (fecha_creacion AT TIME ZONE 'America/Guayaquil')::date
-               = (NOW() AT TIME ZONE 'America/Guayaquil')::date
-         ) AS total_hoy,
-
-         (
-           SELECT COUNT(*)::int
-           FROM clientes
-           WHERE activo = TRUE
-             AND ($1::integer IS NULL OR emprendimiento_id = $1)
-         ) AS clientes,
-
-         (
-           SELECT COUNT(*)::int
-           FROM productos
-           WHERE activo = TRUE
-             AND ($1::integer IS NULL OR emprendimiento_id = $1)
-         ) AS productos,
-
-         (
-           SELECT COUNT(*)::int
-           FROM productos p
-           LEFT JOIN inventario i ON i.producto_id = p.id
-           WHERE p.activo = TRUE
-             AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
-             AND COALESCE(i.existencia, 0) = 0
-         ) AS sin_stock,
-
-         (
-           SELECT COUNT(*)::int
-           FROM productos p
-           LEFT JOIN inventario i ON i.producto_id = p.id
-           WHERE p.activo = TRUE
-             AND ($1::integer IS NULL OR p.emprendimiento_id = $1)
-             AND COALESCE(i.existencia, 0) BETWEEN 1 AND 5
-         ) AS stock_bajo`,
-      [req.negocioId]
-    );
-
-    return res.json({
-      resumen: resultado.rows[0]
-    });
-  } catch (error) {
-    console.error("Error en resumen:", error.message);
-
-    return res.status(500).json({
-      mensaje: "No se pudo consultar el resumen"
     });
   }
 });
 
-// ============================================================
-// HISTORIAL DE INVENTARIO
-// ============================================================
+/* FORMULARIOS DEL PANEL */
 
-app.get(
-  "/inventario/historial",
-  verificarToken,
-  async (req, res) => {
-    let filtros;
+document.addEventListener('submit', e => {
+  const formularioActual = e.target;
 
-    try {
-      filtros = filtrosConsulta(req.query);
-    } catch (error) {
-      return res.status(400).json({
-        mensaje: error.message
-      });
+  if (
+    [
+      'loginForm',
+      'registroForm',
+      'formRecuperar',
+      'formNueva'
+    ].includes(formularioActual.id)
+  ) {
+    return;
+  }
+
+  if (
+    [
+      'filtros',
+      'guardarCatalogo',
+      'guardarMovimiento',
+      'guardarVenta'
+    ].includes(formularioActual.id) === false
+  ) {
+    return;
+  }
+
+  e.preventDefault();
+  if (ocupado) return;
+
+  if (formularioActual.id === 'filtros') {
+    return tarea(cargar);
+  }
+
+  const datos = Object.fromEntries(new FormData(formularioActual));
+
+  if (formularioActual.id === 'guardarCatalogo') {
+    if (pagina === 'productos') {
+      if (!/^\d{1,10}([.,]\d{1,2})?$/.test(datos.precio.trim())) {
+        mensaje('Revisa el precio: máximo dos decimales.', true);
+        return;
+      }
+
+      datos.precio = datos.precio.trim().replace(',', '.');
     }
 
-    const producto = req.query.producto_id || null;
+    return tarea(() => guardar(
+      '/' + pagina + (
+        formularioActual.dataset.id
+          ? '/' + formularioActual.dataset.id
+          : ''
+      ),
+      formularioActual.dataset.id ? 'PUT' : 'POST',
+      datos,
+      formularioActual
+    ));
+  }
+
+  if (formularioActual.id === 'guardarMovimiento') {
+    datos.producto_id = Number(formularioActual.dataset.id);
+    datos.cantidad = Number(datos.cantidad);
 
     if (
-      producto &&
-      (
-        typeof producto !== "string" ||
-        !/^[1-9]\d*$/.test(producto) ||
-        Number(producto) > 2147483647
+      !Number.isSafeInteger(datos.cantidad) ||
+      datos.cantidad < 1 ||
+      datos.cantidad > 2147483647
+    ) {
+      mensaje('Ingresa una cantidad entera positiva válida.', true);
+      return;
+    }
+
+    return tarea(() => guardar(
+      '/inventario/movimientos',
+      'POST',
+      datos,
+      formularioActual
+    ));
+  }
+
+  if (formularioActual.id === 'guardarVenta') {
+    if (!carrito.size) {
+      mensaje('Agrega al menos un producto.', true);
+      return;
+    }
+
+    if (
+      !confirm(
+        '¿Registrar esta venta? Total estimado: $' + totalCarrito()
       )
     ) {
-      return res.status(400).json({
-        mensaje: "Producto inválido"
-      });
+      return;
     }
 
-    try {
-      const resultado = await pool.query(
-        `SELECT
-           m.id,
-           m.producto_id,
-           p.nombre,
-           p.emprendimiento_id,
-           e.nombre AS tienda,
-           m.tipo,
-           m.cantidad,
-           m.motivo,
-           m.existencia_anterior,
-           m.existencia_nueva,
-           m.fecha,
-           u.nombre AS usuario_nombre
-         FROM movimientos_inventario m
-         JOIN productos p ON p.id = m.producto_id
-         JOIN emprendimientos e ON e.id = p.emprendimiento_id
-         JOIN usuarios u ON u.id = m.usuario_id
-         WHERE (
-           $5::integer IS NULL
-           OR p.emprendimiento_id = $5
-         )
-         AND (
-           $1::integer IS NULL
-           OR m.producto_id = $1
-         )
-         AND (
-           $2::date IS NULL
-           OR (m.fecha AT TIME ZONE 'America/Guayaquil')::date
-              >= $2::date
-         )
-         AND (
-           $3::date IS NULL
-           OR (m.fecha AT TIME ZONE 'America/Guayaquil')::date
-              <= $3::date
-         )
-         AND (
-           $4 = ''
-           OR POSITION(LOWER($4) IN LOWER(p.nombre)) > 0
-         )
-         ORDER BY m.fecha DESC, m.id DESC
-         LIMIT 200`,
-        [
-          producto,
-          filtros.desde,
-          filtros.hasta,
-          filtros.busqueda,
-          req.negocioId
-        ]
-      );
+    datos.cliente_id = Number(datos.cliente_id);
 
-      return res.json({
-        movimientos: resultado.rows
-      });
-    } catch (error) {
-      console.error("Error en historial:", error.message);
+    datos.productos = [...carrito].map(
+      ([producto_id, cantidad]) => ({
+        producto_id,
+        cantidad
+      })
+    );
 
-      return res.status(500).json({
-        mensaje: "No se pudo consultar el historial"
-      });
-    }
+    return tarea(() => guardar(
+      '/ventas',
+      'POST',
+      datos,
+      formularioActual
+    ));
   }
-);
-
-// ============================================================
-// ANULAR VENTA
-// ============================================================
-
-app.patch(
-  "/ventas/:id/anular",
-  verificarToken,
-  async (req, res) => {
-    const id = req.params.id;
-
-    if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) {
-      return res.status(400).json({
-        mensaje: "Venta inválida"
-      });
-    }
-
-    let db;
-
-    try {
-      db = await pool.connect();
-      await db.query("BEGIN");
-
-      const resultado = await db.query(
-        `SELECT id, estado
-         FROM ventas
-         WHERE id = $1
-           AND emprendimiento_id = $2
-         FOR UPDATE`,
-        [id, req.negocioId]
-      );
-
-      if (!resultado.rows[0]) {
-        await db.query("ROLLBACK");
-
-        return res.status(404).json({
-          mensaje: "La venta no existe"
-        });
-      }
-
-      if (resultado.rows[0].estado === "anulada") {
-        await db.query("ROLLBACK");
-
-        return res.json({
-          mensaje:
-            "La venta ya estaba anulada; no se duplicó la devolución",
-          venta: resultado.rows[0]
-        });
-      }
-
-      const lineas = await db.query(
-        `SELECT producto_id, cantidad
-         FROM detalle_ventas
-         WHERE venta_id = $1
-         ORDER BY producto_id`,
-        [id]
-      );
-
-      if (!lineas.rows.length) {
-        throw new Error("Venta sin detalle");
-      }
-
-      for (const linea of lineas.rows) {
-        await db.query(
-          `SELECT id
-           FROM productos
-           WHERE id = $1
-           FOR UPDATE`,
-          [linea.producto_id]
-        );
-
-        const inventario = await db.query(
-          `SELECT existencia
-           FROM inventario
-           WHERE producto_id = $1
-           FOR UPDATE`,
-          [linea.producto_id]
-        );
-
-        if (!inventario.rows[0]) {
-          throw new Error("No existe inventario para el producto");
-        }
-
-        const anterior = inventario.rows[0].existencia;
-        const nueva = anterior + linea.cantidad;
-
-        if (nueva > 2147483647) {
-          await db.query("ROLLBACK");
-
-          return res.status(409).json({
-            mensaje: "La devolución supera el límite de inventario"
-          });
-        }
-
-        await db.query(
-          `UPDATE inventario
-           SET existencia = $1,
-               fecha_actualizacion = NOW()
-           WHERE producto_id = $2`,
-          [nueva, linea.producto_id]
-        );
-
-        await db.query(
-          `INSERT INTO movimientos_inventario (
-             producto_id,
-             usuario_id,
-             tipo,
-             cantidad,
-             motivo,
-             existencia_anterior,
-             existencia_nueva
-           )
-           VALUES ($1, $2, 'entrada', $3, $4, $5, $6)`,
-          [
-            linea.producto_id,
-            req.usuario.id,
-            linea.cantidad,
-            `Anulación de venta #${id}`,
-            anterior,
-            nueva
-          ]
-        );
-      }
-
-      const venta = await db.query(
-        `UPDATE ventas
-         SET estado = 'anulada'
-         WHERE id = $1
-         RETURNING id, estado`,
-        [id]
-      );
-
-      await db.query("COMMIT");
-
-      return res.json({
-        mensaje: "Venta anulada. Existencias devueltas al inventario.",
-        venta: venta.rows[0]
-      });
-    } catch (error) {
-      if (db) {
-        try {
-          await db.query("ROLLBACK");
-        } catch (errorRollback) {
-          console.error(
-            "Error al revertir anulación:",
-            errorRollback.message
-          );
-        }
-      }
-
-      console.error("Error al anular venta:", error.message);
-
-      return res.status(500).json({
-        mensaje:
-          "No se pudo confirmar la anulación. Comprueba el estado de la venta."
-      });
-    } finally {
-      if (db) db.release();
-    }
-  }
-);
-
-
-require("./recuperacion")(app, pool);
-
-
-app.listen(PORT, () => {
-  console.log(`Servidor funcionando en http://localhost:${PORT}`);
 });
+
+/* MENÚ LATERAL Y ACCESOS RÁPIDOS */
+
+$('#menuToggle').addEventListener('click', () => {
+  const cerrado = document.body.classList.toggle('menu-cerrado');
+
+  $('#menuToggle').setAttribute(
+    'aria-expanded',
+    String(!cerrado)
+  );
+});
+
+document.addEventListener('click', e => {
+  const botonActual = e.target.closest('[data-ir]');
+
+  if (botonActual && !ocupado) {
+    tarea(async () => {
+      mensaje('');
+      await navegar(botonActual.dataset.ir);
+    });
+  }
+});
+
+if (window.innerWidth <= 800) {
+  document.body.classList.add('menu-cerrado');
+  $('#menuToggle').setAttribute('aria-expanded', 'false');
+}
+
+/* INICIO */
+
+traducirAcceso();
+acceso();
+</script>
+</body>
+</html>
+
+
+
+
