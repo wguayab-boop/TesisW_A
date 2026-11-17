@@ -6,6 +6,10 @@
 
 
 
+
+
+
+
 <!doctype html>
 
 <html lang="es">
@@ -94,6 +98,8 @@ body:not(.autenticado) main{max-width:1440px;margin:0 auto;padding:0 5% 40px}
 #login input{min-height:54px;padding:15px;background:#f9fbfa;border:1px solid #c9d9d2;border-radius:10px;font-size:16px}
 #login label{margin:22px 0}
 #login label span{font-size:14px;font-weight:600;color:#37584f;margin-bottom:9px}
+#login .campo-clave{margin:22px 0}
+#login .campo-clave label{margin:0 0 9px;font-size:14px;font-weight:600;color:#37584f}
 #loginForm>button{width:100%;min-height:54px;font-weight:700;margin-top:6px;font-size:16px;background:#187566}
 #abrirRecuperacion{padding:4px 0;background:transparent;color:#176e60;text-align:left;font-size:14px}
 #abrirRegistro{width:100%;border:1px solid #bbd5c9;background:white;color:#176e60;font-weight:600;min-height:50px}
@@ -321,11 +327,15 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
       <input name="correo" type="email" required
              maxlength="150" autocomplete="username">
     </label>
-    <label>
-      <span data-texto="password">Contraseña</span>
-      <input name="password" type="password" required
-             autocomplete="current-password">
-    </label>
+    <div class="campo-clave">
+      <label for="claveLogin" data-texto="password">Contraseña</label>
+      <div class="entrada-clave">
+        <input id="claveLogin" name="password" type="password" required
+               autocomplete="current-password">
+        <button type="button" aria-controls="claveLogin"
+                data-texto="mostrarClave">Mostrar contraseña</button>
+      </div>
+    </div>
     <button class="primary" type="submit" data-texto="ingresar">
       Ingresar
     </button>
@@ -831,6 +841,7 @@ function acceso() {
   document.body.classList.toggle('autenticado', dentro);
 
   $('#login').hidden = dentro || vistaAcceso !== 'login';
+  if ($('#login').hidden) ocultarClaveLogin();
   $('#registro').hidden = dentro || vistaAcceso !== 'registro';
   $('#recuperarCuenta').hidden = dentro || vistaAcceso !== 'recuperar';
   $('#restablecerCuenta').hidden = dentro || vistaAcceso !== 'restablecer';
@@ -1792,8 +1803,7 @@ $('#abrirRegistro').addEventListener('click', () => {
   vistaFormulario('registro');
 });
 
-const formularioRegistro = $('#registroForm');
-formularioRegistro.querySelectorAll('.entrada-clave button').forEach(boton => {
+function configurarVisibilidadClave(boton) {
   const campo = document.getElementById(boton.getAttribute('aria-controls'));
   const mostrar = boton.dataset.texto;
   const ocultar = campo.name === 'password' ? 'ocultarClave' : 'ocultarConfirmacion';
@@ -1804,9 +1814,14 @@ formularioRegistro.querySelectorAll('.entrada-clave button').forEach(boton => {
     boton.textContent = t(boton.dataset.texto);
   }
 
+  const ocultarCampo = () => visibilidadClave(false);
   boton.addEventListener('click', () => visibilidadClave(campo.type === 'password'));
-  formularioRegistro.addEventListener('reset', () => visibilidadClave(false));
-});
+  campo.form.addEventListener('reset', ocultarCampo);
+  return ocultarCampo;
+}
+
+const ocultarClaveLogin = configurarVisibilidadClave($('#loginForm .entrada-clave button'));
+$('#registroForm').querySelectorAll('.entrada-clave button').forEach(configurarVisibilidadClave);
 
 $('#volverLogin').addEventListener('click', () => {
   if (ocupado) return;
@@ -2382,6 +2397,10 @@ acceso();
 
 </body>
 </html>
+
+
+
+
 
 
 
