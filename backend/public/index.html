@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 
 <html lang="es">
@@ -131,6 +133,25 @@ body.menu-cerrado #sidebar{transform:translateX(-100%)}
 body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-left:0}
 #sesion{max-width:100%}
 #sesion select{max-width:420px}
+#accionesNegocio{width:250px;max-width:100%}
+#accionesNegocio:empty{display:none}
+#sesion #salir{display:block;margin-top:14px}
+.acciones-negocio{border:1px solid #b9d5ce;border-radius:10px;background:#f2f8f6}
+.acciones-negocio summary{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:42px;padding:9px 12px;cursor:pointer;list-style:none;
+  color:#145e54;font-size:.875rem;font-weight:650;border-radius:9px
+}
+.acciones-negocio summary::-webkit-details-marker{display:none}
+.acciones-negocio summary::after{
+  content:"";width:7px;height:7px;border:solid currentColor;
+  border-width:0 2px 2px 0;transform:rotate(45deg);margin-right:3px
+}
+.acciones-negocio[open] summary::after{transform:rotate(225deg)}
+.acciones-negocio summary:hover{background:#e3f1ed}
+.acciones-negocio summary:focus-visible{outline:2px solid #176e60;outline-offset:2px}
+.acciones-negocio-lista{display:grid;gap:5px;padding:6px;border-top:1px solid #d5e7e1}
+.acciones-negocio-lista button{width:100%;margin:0;text-align:left;font-size:.875rem}
 
 /* Dashboard */
 #datos>.grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -838,11 +859,16 @@ function mostrarAccionesNegocio() {
   }
 
   acciones.innerHTML = `
-    ${negocio.bloqueado_en || negocio.eliminado_en
-      ? '<button type="button" data-accion-negocio="recuperar">Recuperar emprendimiento</button>'
-      : '<button type="button" data-accion-negocio="bloquear">Bloquear emprendimiento</button>'}
-    ${negocio.eliminado_en ? '' :
-      '<button type="button" class="danger" data-accion-negocio="eliminar">Eliminar emprendimiento</button>'}
+    <details class="acciones-negocio">
+      <summary>Acciones del emprendimiento</summary>
+      <div class="acciones-negocio-lista">
+        ${negocio.bloqueado_en || negocio.eliminado_en
+          ? '<button type="button" data-accion-negocio="recuperar">Recuperar emprendimiento</button>'
+          : '<button type="button" data-accion-negocio="bloquear">Bloquear emprendimiento</button>'}
+        ${negocio.eliminado_en ? '' :
+          '<button type="button" class="danger" data-accion-negocio="eliminar">Eliminar emprendimiento</button>'}
+      </div>
+    </details>
   `;
 }
 
@@ -2313,3 +2339,7 @@ acceso();
 
 </body>
 </html>
+
+
+
+
