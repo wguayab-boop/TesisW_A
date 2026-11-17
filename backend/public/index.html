@@ -810,16 +810,12 @@ function acceso() {
                 ${negocios.map(n => `
                   <option value="${E(n.id)}"
                     ${String(n.id) === negocioSeleccionado ? 'selected' : ''}>
-                    ${E(n.nombre)} · ${E(n.categoria)}
+                    ${E(n.nombre)} · ${E(n.categoria)}${n.eliminado_en ? " (Eliminado)" : n.bloqueado_en ? " (Bloqueado)" : ""}
                   </option>
                 `).join('')}
               </select>
             </label>
-            <button id="eliminarNegocio" class="danger" type="button"
-                    data-bloqueado="${negocioSeleccionado ? '0' : '1'}"
-                    ${negocioSeleccionado ? '' : 'disabled'}>
-              Eliminar emprendimiento
-            </button>
+            <div id="accionesNegocio"></div>
           `
           : ''
       }
@@ -827,6 +823,27 @@ function acceso() {
       <button id="salir">Cerrar sesión</button>
     `
     : '';
+
+  mostrarAccionesNegocio();
+}
+
+function mostrarAccionesNegocio() {
+  const acciones = $('#accionesNegocio');
+  if (!acciones) return;
+
+  const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
+  if (!negocio) {
+    acciones.innerHTML = '';
+    return;
+  }
+
+  acciones.innerHTML = `
+    ${negocio.bloqueado_en || negocio.eliminado_en
+      ? '<button type="button" data-accion-negocio="recuperar">Recuperar emprendimiento</button>'
+      : '<button type="button" data-accion-negocio="bloquear">Bloquear emprendimiento</button>'}
+    ${negocio.eliminado_en ? '' :
+      '<button type="button" class="danger" data-accion-negocio="eliminar">Eliminar emprendimiento</button>'}
+  `;
 }
 
 function vistaFormulario(vista) {
@@ -1932,7 +1949,7 @@ $('#sesion').addEventListener('change', e => {
   if (e.target.id !== 'seleccionNegocio' || ocupado) return;
 
   negocioSeleccionado = e.target.value;
-  $('#eliminarNegocio').dataset.bloqueado = negocioSeleccionado ? '0' : '1';
+  mostrarAccionesNegocio();
 
   tarea(async () => {
     if (modal.open) modal.close();
@@ -1947,30 +1964,30 @@ $('#sesion').addEventListener('change', e => {
 });
 
 $('#sesion').addEventListener('click', e => {
-  if (!e.target.closest('#eliminarNegocio') || ocupado || !esAdmin()) return;
+  const boton = e.target.closest('[data-accion-negocio]');
+  if (!boton || ocupado || !esAdmin()) return;
 
   const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
-  if (!negocio || !window.confirm(
-    `¿Eliminar «${negocio.nombre}»? Sus cuentas perderán el acceso y se conservará su historial.`
-  )) return;
+  if (!negocio) return;
+
+  const accion = boton.dataset.accionNegocio;
+  const preguntas = {
+    bloquear: 'Se suspenderá el acceso de sus cuentas.',
+    recuperar: 'Las cuentas activas del emprendimiento podrán volver a ingresar.',
+    eliminar: 'Se suspenderá el acceso de sus cuentas y se conservará su historial.'
+  };
+  if (!window.confirm(`¿Deseas ${accion} «${negocio.nombre}»? ${preguntas[accion]}`)) return;
 
   tarea(async () => {
     mensaje('');
     const resultado = await api(
-      '/emprendimientos/' + encodeURIComponent(negocio.id),
-      'DELETE'
+      '/emprendimientos/' + encodeURIComponent(negocio.id) + '/estado',
+      'PATCH',
+      { accion }
     );
 
-    negocios = negocios.filter(n => n.id !== negocio.id);
-    negocioSeleccionado = '';
-    registros = [];
-    catalogo = [];
-    carrito.clear();
-    if (modal.open) modal.close();
+    negocios = negocios.map(n => n.id === negocio.id ? resultado.emprendimiento : n);
     acceso();
-    controles();
-
-    await navegar(pagina);
     mensaje(resultado.mensaje);
   });
 });

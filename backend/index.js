@@ -233,7 +233,8 @@ app.post("/login", async (req, res) => {
          e.categoria
        FROM usuarios u
        LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
-       WHERE u.correo = $1 AND e.eliminado_en IS NULL`,
+       WHERE u.correo = $1 AND e.eliminado_en IS NULL
+         AND e.bloqueado_en IS NULL`,
       [correo.trim().toLowerCase()]
     );
 
@@ -338,7 +339,8 @@ async function comprobarAcceso(req, res, next, permiteGestion) {
        LEFT JOIN emprendimientos e ON e.id = u.emprendimiento_id
        WHERE u.id::text = $1
          AND u.activo = TRUE
-         AND e.eliminado_en IS NULL`,
+         AND e.eliminado_en IS NULL
+         AND e.bloqueado_en IS NULL`,
       [datos.sub]
     );
 
@@ -420,9 +422,8 @@ app.get("/emprendimientos", verificarToken, async (req, res) => {
 
   try {
     const resultado = await pool.query(
-      `SELECT id, nombre, categoria
+      `SELECT id, nombre, categoria, bloqueado_en, eliminado_en
        FROM emprendimientos
-       WHERE eliminado_en IS NULL
        ORDER BY nombre, id`
     );
 
@@ -438,14 +439,13 @@ app.get("/emprendimientos", verificarToken, async (req, res) => {
   }
 });
 
-app.delete(
-  "/emprendimientos/:id",
-  (req, res, next) => comprobarAcceso(req, res, next, true),
-  async (req, res) => {
+const accesoGestionEmprendimientos = (req, res, next) =>
+  comprobarAcceso(req, res, next, true);
+
+function cambiarEstadoEmprendimiento(accionFija) {
+  return async (req, res) => {
     if (req.usuario.rol !== "administrador") {
-      return res.status(403).json({
-        mensaje: "Acceso exclusivo del administrador"
-      });
+      return res.status(403).json({ mensaje: "Acceso exclusivo del administrador" });
     }
 
     const id = req.params.id;
@@ -453,27 +453,65 @@ app.delete(
       return res.status(400).json({ mensaje: "Emprendimiento inválido" });
     }
 
+    const accion = accionFija ?? req.body?.accion;
+    const mensajes = new Map([
+      ["bloquear", "Emprendimiento bloqueado."],
+      ["recuperar", "Emprendimiento recuperado."],
+      ["eliminar", "Emprendimiento eliminado."]
+    ]);
+    if (!mensajes.has(accion)) {
+      return res.status(400).json({ mensaje: "Acción inválida" });
+    }
+
     try {
       const resultado = await pool.query(
         `UPDATE emprendimientos
-         SET eliminado_en = COALESCE(eliminado_en, NOW())
+         SET bloqueado_en = CASE
+               WHEN $2 = 'recuperar' THEN NULL
+               WHEN $2 = 'bloquear' AND eliminado_en IS NULL
+                 THEN COALESCE(bloqueado_en, NOW())
+               ELSE bloqueado_en
+             END,
+             eliminado_en = CASE
+               WHEN $2 = 'recuperar' THEN NULL
+               WHEN $2 = 'eliminar' THEN COALESCE(eliminado_en, NOW())
+               ELSE eliminado_en
+             END
          WHERE id = $1
-         RETURNING id`,
-        [id]
+         RETURNING id, nombre, categoria, bloqueado_en, eliminado_en`,
+        [id, accion]
       );
 
-      if (!resultado.rows[0]) {
+      const emprendimiento = resultado.rows[0];
+      if (!emprendimiento) {
         return res.status(404).json({ mensaje: "Emprendimiento no encontrado" });
       }
+      if (accion === "bloquear" && emprendimiento.eliminado_en) {
+        return res.status(409).json({
+          mensaje: "El emprendimiento está eliminado. Actualiza el panel para recuperarlo."
+        });
+      }
 
-      return res.json({ mensaje: "Emprendimiento eliminado." });
+      return res.json({ mensaje: mensajes.get(accion), emprendimiento });
     } catch (error) {
-      console.error("Error al eliminar emprendimiento:", error.message);
+      console.error("Error al cambiar estado del emprendimiento:", error.message);
       return res.status(500).json({
-        mensaje: "No se pudo confirmar la eliminación del emprendimiento"
+        mensaje: "No se pudo confirmar el cambio de estado del emprendimiento"
       });
     }
-  }
+  };
+}
+
+app.patch(
+  "/emprendimientos/:id/estado",
+  accesoGestionEmprendimientos,
+  cambiarEstadoEmprendimiento()
+);
+
+app.delete(
+  "/emprendimientos/:id",
+  accesoGestionEmprendimientos,
+  cambiarEstadoEmprendimiento("eliminar")
 );
 
 // ============================================================
@@ -1943,7 +1981,8 @@ require("./recuperacion")(app, pool);
 async function iniciarServidor() {
   await pool.query(
     `ALTER TABLE emprendimientos
-     ADD COLUMN IF NOT EXISTS eliminado_en TIMESTAMPTZ`
+     ADD COLUMN IF NOT EXISTS eliminado_en TIMESTAMPTZ,
+     ADD COLUMN IF NOT EXISTS bloqueado_en TIMESTAMPTZ`
   );
 
   app.listen(PORT, () => {
