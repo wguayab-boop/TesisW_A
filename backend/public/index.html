@@ -1,4 +1,13 @@
+
+
+
+
+
+
+
+
 <!doctype html>
+
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -23,6 +32,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 input,select,textarea{display:block;width:100%;padding:11px;border:1px solid #b8c8dd;border-radius:7px;font:inherit;background:white}
 label{display:block;margin:12px 0}
 label span{display:block;margin-bottom:6px}
+.campo-clave{margin:12px 0}
+.campo-clave label{margin:0 0 6px}
+.entrada-clave{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.entrada-clave input::-ms-reveal{display:none}
+.entrada-clave button{color:#176e60;background:#edf4f5}
 .card{background:white;border:1px solid #e4eaf0;border-radius:16px;padding:24px;box-shadow:0 3px 16px #21394f05}
 .login{max-width:500px;margin:40px auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
@@ -130,6 +144,25 @@ body.menu-cerrado #sidebar{transform:translateX(-100%)}
 body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-left:0}
 #sesion{max-width:100%}
 #sesion select{max-width:420px}
+#accionesNegocio{width:250px;max-width:100%}
+#accionesNegocio:empty{display:none}
+#sesion #salir{display:block;margin-top:14px}
+.acciones-negocio{border:1px solid #b9d5ce;border-radius:10px;background:#f2f8f6}
+.acciones-negocio summary{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:42px;padding:9px 12px;cursor:pointer;list-style:none;
+  color:#145e54;font-size:.875rem;font-weight:650;border-radius:9px
+}
+.acciones-negocio summary::-webkit-details-marker{display:none}
+.acciones-negocio summary::after{
+  content:"";width:7px;height:7px;border:solid currentColor;
+  border-width:0 2px 2px 0;transform:rotate(45deg);margin-right:3px
+}
+.acciones-negocio[open] summary::after{transform:rotate(225deg)}
+.acciones-negocio summary:hover{background:#e3f1ed}
+.acciones-negocio summary:focus-visible{outline:2px solid #176e60;outline-offset:2px}
+.acciones-negocio-lista{display:grid;gap:5px;padding:6px;border-top:1px solid #d5e7e1}
+.acciones-negocio-lista button{width:100%;margin:0;text-align:left;font-size:.875rem}
 
 /* Dashboard */
 #datos>.grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -190,6 +223,7 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
   #sidebar{transition:none}
 }
 </style>
+
 </head>
 
 <body>
@@ -231,88 +265,89 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
         <span class="marca-portada-ciudad">GUAYAQUIL</span>
       </div>
 
-      <span class="portada-etiqueta" data-texto="portadaEtiqueta">
-        HECHO PARA TU EMPRENDIMIENTO
-      </span>
+  <span class="portada-etiqueta" data-texto="portadaEtiqueta">
+    HECHO PARA TU EMPRENDIMIENTO
+  </span>
 
-      <h2 data-texto="portadaTitulo">
-        Tu negocio, organizado en un solo lugar.
-      </h2>
+  <h2 data-texto="portadaTitulo">
+    Tu negocio, organizado en un solo lugar.
+  </h2>
 
-      <p class="portada-descripcion" data-texto="portadaDescripcion">
-        Productos, clientes y ventas en un mismo lugar.
-        Dedica más tiempo a tus clientes y lleva el control de cada operación.
-      </p>
+  <p class="portada-descripcion" data-texto="portadaDescripcion">
+    Productos, clientes y ventas en un mismo lugar.
+    Dedica más tiempo a tus clientes y lleva el control de cada operación.
+  </p>
 
-      <div class="escena-tienda" aria-hidden="true">
-        <div class="tienda-techo"></div>
-        <div class="tienda-marca">SMARTMARKET</div>
-        <div class="tienda-ventana">
-          <span>▣</span><span>▣</span><span>▣</span>
-        </div>
-        <div class="tienda-puerta"></div>
-        <div class="tienda-nota">
-          ✓ <span data-texto="portadaOrden">Todo en orden</span>
-        </div>
-      </div>
-
-      <div class="portada-beneficios">
-        <div>
-          <span>01</span>
-          <strong data-texto="beneficioUno">Organiza tus productos</strong>
-        </div>
-        <div>
-          <span>02</span>
-          <strong data-texto="beneficioDos">Registra tus ventas</strong>
-        </div>
-        <div>
-          <span>03</span>
-          <strong data-texto="beneficioTres">Conoce tus existencias</strong>
-        </div>
-      </div>
+  <div class="escena-tienda" aria-hidden="true">
+    <div class="tienda-techo"></div>
+    <div class="tienda-marca">SMARTMARKET</div>
+    <div class="tienda-ventana">
+      <span>▣</span><span>▣</span><span>▣</span>
     </div>
+    <div class="tienda-puerta"></div>
+    <div class="tienda-nota">
+      ✓ <span data-texto="portadaOrden">Todo en orden</span>
+    </div>
+  </div>
 
-    <section id="login" class="card login">
-      <span class="login-eyebrow" data-texto="loginEtiqueta">
-        TU ESPACIO DE TRABAJO
-      </span>
-      <h2 data-texto="inicio">Iniciar sesión</h2>
-      <p class="muted" data-texto="descripcionLogin">
-        Utiliza tu cuenta del sistema.
-      </p>
+  <div class="portada-beneficios">
+    <div>
+      <span>01</span>
+      <strong data-texto="beneficioUno">Organiza tus productos</strong>
+    </div>
+    <div>
+      <span>02</span>
+      <strong data-texto="beneficioDos">Registra tus ventas</strong>
+    </div>
+    <div>
+      <span>03</span>
+      <strong data-texto="beneficioTres">Conoce tus existencias</strong>
+    </div>
+  </div>
+</div>
 
-      <form id="loginForm">
-        <label>
-          <span data-texto="correo">Correo electrónico</span>
-          <input name="correo" type="email" required
-                 maxlength="150" autocomplete="username">
-        </label>
-        <label>
-          <span data-texto="password">Contraseña</span>
-          <input name="password" type="password" required
-                 autocomplete="current-password">
-        </label>
-        <button class="primary" type="submit" data-texto="ingresar">
-          Ingresar
-        </button>
-      </form>
+<section id="login" class="card login">
+  <span class="login-eyebrow" data-texto="loginEtiqueta">
+    TU ESPACIO DE TRABAJO
+  </span>
+  <h2 data-texto="inicio">Iniciar sesión</h2>
+  <p class="muted" data-texto="descripcionLogin">
+    Utiliza tu cuenta del sistema.
+  </p>
 
-      <p class="muted" style="margin: 12px 0; text-align: center; font-size: 0.85rem;">
-        Desarrollado por AA y WG
-      </p>
+  <form id="loginForm">
+    <label>
+      <span data-texto="correo">Correo electrónico</span>
+      <input name="correo" type="email" required
+             maxlength="150" autocomplete="username">
+    </label>
+    <label>
+      <span data-texto="password">Contraseña</span>
+      <input name="password" type="password" required
+             autocomplete="current-password">
+    </label>
+    <button class="primary" type="submit" data-texto="ingresar">
+      Ingresar
+    </button>
+  </form>
 
-      <p>
-        <button id="abrirRecuperacion" type="button" data-texto="olvido">
-          ¿Olvidaste tu contraseña?
-        </button>
-      </p>
-      <p class="muted" data-texto="sinCuenta">
-        ¿Todavía no tienes cuenta?
-      </p>
-      <button id="abrirRegistro" type="button" data-texto="crearCuenta">
-        Crear cuenta
-      </button>
-    </section>
+  <p class="muted" style="margin: 12px 0; text-align: center; font-size: 0.85rem;">
+    Desarrollado por AA y WG
+  </p>
+
+  <p>
+    <button id="abrirRecuperacion" type="button" data-texto="olvido">
+      ¿Olvidaste tu contraseña?
+    </button>
+  </p>
+  <p class="muted" data-texto="sinCuenta">
+    ¿Todavía no tienes cuenta?
+  </p>
+  <button id="abrirRegistro" type="button" data-texto="crearCuenta">
+    Crear cuenta
+  </button>
+</section>
+
   </div>
 
   <section class="banners-informativos"
@@ -341,139 +376,153 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
   </section>
 
   <!-- REGISTRO -->
+
   <section id="registro" class="card login" hidden>
     <h2 data-texto="crearCuenta">Crear cuenta</h2>
     <p class="muted" data-texto="descripcionRegistro">
       Registra tus datos para ingresar a SMARTMARKET GUAYAQUIL.
     </p>
 
-    <form id="registroForm">
-      <label>
-        <span data-texto="nombre">Nombre del responsable</span>
-        <input name="nombre" required maxlength="100" autocomplete="name">
-      </label>
+<form id="registroForm">
+  <label>
+    <span data-texto="nombre">Nombre del responsable</span>
+    <input name="nombre" required maxlength="100" autocomplete="name">
+  </label>
 
-      <label>
-        <span data-texto="tienda">Nombre de la tienda</span>
-        <input name="tienda" required maxlength="150"
-               autocomplete="organization">
-      </label>
+  <label>
+    <span data-texto="tienda">Nombre del negocio</span>
+    <input name="tienda" required maxlength="150"
+           autocomplete="organization">
+  </label>
 
-      <label>
-        <span data-texto="categoria">Categoría del negocio</span>
-        <select name="categoria" required>
-          <option value="" data-texto="seleccionarCategoria">
-            Selecciona una categoría
-          </option>
-          <option value="Abarrotes" data-texto="catAbarrotes">
-            Abarrotes
-          </option>
-          <option value="Ropa y accesorios" data-texto="catRopa">
-            Ropa y accesorios
-          </option>
-          <option value="Tecnología" data-texto="catTecnologia">
-            Tecnología
-          </option>
-          <option value="Alimentos y bebidas" data-texto="catAlimentos">
-            Alimentos y bebidas
-          </option>
-          <option value="Belleza y cuidado personal" data-texto="catBelleza">
-            Belleza y cuidado personal
-          </option>
-          <option value="Ferretería" data-texto="catFerreteria">
-            Ferretería
-          </option>
-          <option value="Otros" data-texto="catOtros">
-            Otros
-          </option>
-        </select>
-      </label>
+  <label>
+    <span data-texto="categoria">Categoría del negocio</span>
+    <select name="categoria" required>
+      <option value="" data-texto="seleccionarCategoria">
+        Selecciona una categoría
+      </option>
+      <option value="Abarrotes" data-texto="catAbarrotes">
+        Abarrotes
+      </option>
+      <option value="Ropa y accesorios" data-texto="catRopa">
+        Ropa y accesorios
+      </option>
+      <option value="Tecnología" data-texto="catTecnologia">
+        Tecnología
+      </option>
+      <option value="Alimentos y bebidas" data-texto="catAlimentos">
+        Alimentos y bebidas
+      </option>
+      <option value="Belleza y cuidado personal" data-texto="catBelleza">
+        Belleza y cuidado personal
+      </option>
+      <option value="Ferretería" data-texto="catFerreteria">
+        Ferretería
+      </option>
+      <option value="Otros" data-texto="catOtros">
+        Otros
+      </option>
+    </select>
+  </label>
 
-      <label>
-        <span data-texto="correo">Correo electrónico</span>
-        <input name="correo" type="email" required maxlength="150"
-               autocomplete="email">
-      </label>
+  <label>
+    <span data-texto="correo">Correo electrónico</span>
+    <input name="correo" type="email" required maxlength="150"
+           autocomplete="email">
+  </label>
 
-      <label>
-        <span data-texto="password">Contraseña</span>
-        <input name="password" type="password" required minlength="8"
-               autocomplete="new-password" aria-describedby="ayudaClave">
-      </label>
+  <div class="campo-clave">
+    <label for="claveRegistro" data-texto="password">Contraseña</label>
+    <div class="entrada-clave">
+      <input id="claveRegistro" name="password" type="password" required
+             minlength="8" autocomplete="new-password" aria-describedby="ayudaClave">
+      <button type="button" aria-controls="claveRegistro"
+              data-texto="mostrarClave">Mostrar contraseña</button>
+    </div>
+  </div>
 
-      <small id="ayudaClave" data-texto="ayuda">
-        Mínimo 8 caracteres y máximo 72 bytes.
-      </small>
+  <small id="ayudaClave" data-texto="ayuda">
+    Mínimo 8 caracteres y máximo 72 bytes.
+  </small>
 
-      <label>
-        <span data-texto="confirmar">Confirmar contraseña</span>
-        <input name="confirmacion" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
+  <div class="campo-clave">
+    <label for="confirmacionRegistro" data-texto="confirmar">Confirmar contraseña</label>
+    <div class="entrada-clave">
+      <input id="confirmacionRegistro" name="confirmacion" type="password" required
+             minlength="8" autocomplete="new-password">
+      <button type="button" aria-controls="confirmacionRegistro"
+              data-texto="mostrarConfirmacion">Mostrar confirmación</button>
+    </div>
+  </div>
 
-      <button class="primary" type="submit" data-texto="registrarse">
-        Registrarse
-      </button>
-    </form>
+  <button class="primary" type="submit" data-texto="registrarse">
+    Registrarse
+  </button>
+</form>
 
-    <p class="muted" data-texto="yaCuenta">¿Ya tienes cuenta?</p>
-    <button id="volverLogin" type="button" data-texto="volver">
-      Volver a iniciar sesión
-    </button>
+<p class="muted" data-texto="yaCuenta">¿Ya tienes cuenta?</p>
+<button id="volverLogin" type="button" data-texto="volver">
+  Volver a iniciar sesión
+</button>
+
   </section>
 
   <!-- RECUPERACIÓN -->
+
   <section id="recuperarCuenta" class="card login" hidden>
     <h2 data-texto="recuperar">Recuperar contraseña</h2>
     <p class="muted" data-texto="recuperacionInfo">
       Escribe el correo con el que registraste tu cuenta.
     </p>
 
-    <form id="formRecuperar">
-      <label>
-        <span data-texto="correo">Correo electrónico</span>
-        <input name="correo" type="email" required maxlength="150"
-               autocomplete="email">
-      </label>
-      <button class="primary" type="submit" data-texto="enviar">
-        Enviar enlace
-      </button>
-    </form>
+<form id="formRecuperar">
+  <label>
+    <span data-texto="correo">Correo electrónico</span>
+    <input name="correo" type="email" required maxlength="150"
+           autocomplete="email">
+  </label>
+  <button class="primary" type="submit" data-texto="enviar">
+    Enviar enlace
+  </button>
+</form>
 
-    <p>
-      <button type="button" id="volverDesdeRecuperar" data-texto="volver">
-        Volver a iniciar sesión
-      </button>
-    </p>
+<p>
+  <button type="button" id="volverDesdeRecuperar" data-texto="volver">
+    Volver a iniciar sesión
+  </button>
+</p>
+
   </section>
 
   <section id="restablecerCuenta" class="card login" hidden>
     <h2 data-texto="nueva">Crear nueva contraseña</h2>
 
-    <form id="formNueva">
-      <label>
-        <span data-texto="nuevaPassword">Nueva contraseña</span>
-        <input name="password" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
-      <label>
-        <span data-texto="confirmar">Confirmar contraseña</span>
-        <input name="confirmacion" type="password" required minlength="8"
-               autocomplete="new-password">
-      </label>
-      <button class="primary" type="submit" data-texto="guardarClave">
-        Guardar contraseña
-      </button>
-    </form>
+<form id="formNueva">
+  <label>
+    <span data-texto="nuevaPassword">Nueva contraseña</span>
+    <input name="password" type="password" required minlength="8"
+           autocomplete="new-password">
+  </label>
+  <label>
+    <span data-texto="confirmar">Confirmar contraseña</span>
+    <input name="confirmacion" type="password" required minlength="8"
+           autocomplete="new-password">
+  </label>
+  <button class="primary" type="submit" data-texto="guardarClave">
+    Guardar contraseña
+  </button>
+</form>
 
-    <p>
-      <button type="button" id="volverDesdeNueva" data-texto="volver">
-        Volver a iniciar sesión
-      </button>
-    </p>
+<p>
+  <button type="button" id="volverDesdeNueva" data-texto="volver">
+    Volver a iniciar sesión
+  </button>
+</p>
+
   </section>
 
   <!-- PANEL -->
+
   <section id="app" hidden>
     <aside id="sidebar">
       <div class="sidebrand">
@@ -489,12 +538,13 @@ body.autenticado.menu-cerrado header,body.autenticado.menu-cerrado main{margin-l
       <p class="sidefooter">Tu negocio, bajo control.</p>
     </aside>
 
-    <button id="menuToggle" type="button"
-            aria-controls="sidebar" aria-expanded="true">
-      ☰ Menú
-    </button>
+<button id="menuToggle" type="button"
+        aria-controls="sidebar" aria-expanded="true">
+  ☰ Menú
+</button>
 
-    <div id="contenido"></div>
+<div id="contenido"></div>
+
   </section>
 </main>
 
@@ -580,7 +630,11 @@ const textos = {
     descripcionRegistro:
       'Registra tus datos para ingresar a SMARTMARKET GUAYAQUIL.',
     nombre: 'Nombre del responsable',
-    tienda: 'Nombre de la tienda',
+    tienda: 'Nombre del negocio',
+    mostrarClave: 'Mostrar contraseña',
+    ocultarClave: 'Ocultar contraseña',
+    mostrarConfirmacion: 'Mostrar confirmación',
+    ocultarConfirmacion: 'Ocultar confirmación',
     categoria: 'Categoría del negocio',
     seleccionarCategoria: 'Selecciona una categoría',
     catAbarrotes: 'Abarrotes',
@@ -655,7 +709,11 @@ const textos = {
     crearCuenta: 'Create account',
     descripcionRegistro: 'Enter your details to join SMARTMARKET GUAYAQUIL.',
     nombre: 'Account holder name',
-    tienda: 'Store name',
+    tienda: 'Business name',
+    mostrarClave: 'Show password',
+    ocultarClave: 'Hide password',
+    mostrarConfirmacion: 'Show confirmation',
+    ocultarConfirmacion: 'Hide confirmation',
     categoria: 'Business category',
     seleccionarCategoria: 'Select a category',
     catAbarrotes: 'Groceries',
@@ -800,11 +858,12 @@ function acceso() {
                 ${negocios.map(n => `
                   <option value="${E(n.id)}"
                     ${String(n.id) === negocioSeleccionado ? 'selected' : ''}>
-                    ${E(n.nombre)} · ${E(n.categoria)}
+                    ${E(n.nombre)} · ${E(n.categoria)}${n.eliminado_en ? " (Eliminado)" : n.bloqueado_en ? " (Bloqueado)" : ""}
                   </option>
                 `).join('')}
               </select>
             </label>
+            <div id="accionesNegocio"></div>
           `
           : ''
       }
@@ -812,6 +871,32 @@ function acceso() {
       <button id="salir">Cerrar sesión</button>
     `
     : '';
+
+  mostrarAccionesNegocio();
+}
+
+function mostrarAccionesNegocio() {
+  const acciones = $('#accionesNegocio');
+  if (!acciones) return;
+
+  const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
+  if (!negocio) {
+    acciones.innerHTML = '';
+    return;
+  }
+
+  acciones.innerHTML = `
+    <details class="acciones-negocio">
+      <summary>Acciones del emprendimiento</summary>
+      <div class="acciones-negocio-lista">
+        ${negocio.bloqueado_en || negocio.eliminado_en
+          ? '<button type="button" data-accion-negocio="recuperar">Recuperar emprendimiento</button>'
+          : '<button type="button" data-accion-negocio="bloquear">Bloquear emprendimiento</button>'}
+        ${negocio.eliminado_en ? '' :
+          '<button type="button" class="danger" data-accion-negocio="eliminar">Eliminar emprendimiento</button>'}
+      </div>
+    </details>
+  `;
 }
 
 function vistaFormulario(vista) {
@@ -1707,6 +1792,22 @@ $('#abrirRegistro').addEventListener('click', () => {
   vistaFormulario('registro');
 });
 
+const formularioRegistro = $('#registroForm');
+formularioRegistro.querySelectorAll('.entrada-clave button').forEach(boton => {
+  const campo = document.getElementById(boton.getAttribute('aria-controls'));
+  const mostrar = boton.dataset.texto;
+  const ocultar = campo.name === 'password' ? 'ocultarClave' : 'ocultarConfirmacion';
+
+  function visibilidadClave(visible) {
+    campo.type = visible ? 'text' : 'password';
+    boton.dataset.texto = visible ? ocultar : mostrar;
+    boton.textContent = t(boton.dataset.texto);
+  }
+
+  boton.addEventListener('click', () => visibilidadClave(campo.type === 'password'));
+  formularioRegistro.addEventListener('reset', () => visibilidadClave(false));
+});
+
 $('#volverLogin').addEventListener('click', () => {
   if (ocupado) return;
   $('#registroForm').reset();
@@ -1917,6 +2018,7 @@ $('#sesion').addEventListener('change', e => {
   if (e.target.id !== 'seleccionNegocio' || ocupado) return;
 
   negocioSeleccionado = e.target.value;
+  mostrarAccionesNegocio();
 
   tarea(async () => {
     if (modal.open) modal.close();
@@ -1927,6 +2029,35 @@ $('#sesion').addEventListener('change', e => {
     mensaje('');
 
     await navegar(pagina);
+  });
+});
+
+$('#sesion').addEventListener('click', e => {
+  const boton = e.target.closest('[data-accion-negocio]');
+  if (!boton || ocupado || !esAdmin()) return;
+
+  const negocio = negocios.find(n => String(n.id) === negocioSeleccionado);
+  if (!negocio) return;
+
+  const accion = boton.dataset.accionNegocio;
+  const preguntas = {
+    bloquear: 'Se suspenderá el acceso de sus cuentas.',
+    recuperar: 'Las cuentas activas del emprendimiento podrán volver a ingresar.',
+    eliminar: 'Se suspenderá el acceso de sus cuentas y se conservará su historial.'
+  };
+  if (!window.confirm(`¿Deseas ${accion} «${negocio.nombre}»? ${preguntas[accion]}`)) return;
+
+  tarea(async () => {
+    mensaje('');
+    const resultado = await api(
+      '/emprendimientos/' + encodeURIComponent(negocio.id) + '/estado',
+      'PATCH',
+      { accion }
+    );
+
+    negocios = negocios.map(n => n.id === negocio.id ? resultado.emprendimiento : n);
+    acceso();
+    mensaje(resultado.mensaje);
   });
 });
 
@@ -2248,5 +2379,14 @@ if (window.innerWidth <= 800) {
 traducirAcceso();
 acceso();
 </script>
+
 </body>
 </html>
+
+
+
+
+
+
+
+
